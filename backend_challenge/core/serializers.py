@@ -3,12 +3,13 @@ from rest_framework import serializers
 from rest_framework.exceptions import APIException, NotFound, ValidationError
 
 from .models import Customer, Order
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class CustomerProfileUnavailable(APIException):
-    status_code = 400
-    default_detail = "Create CustomerProfile"
-    default_code = "service_unavailable"
+    """Exception raised when customer profile  is not present in the data."""
+    status_code = 404
+    # default_detail = 'Service temporarily unavailable, try again later.'
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -24,17 +25,23 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ("item", "amount", "customer")
 
-
     def create(self, validated_data):
+        """
+        Create a new Order instance, given the accepted data
+        and with the request user
+        """
         request = self.context.get("request", None)
+        
         if request is None:
             return False
+        # customer=get_object_or_404(Customer, user=user)
         if "customer" not in validated_data:
             try:
                 validated_data["customer"] = request.user.customer
-            except Customer.DoesNotExist:
-                raise CustomerProfileUnavailable()
+                
+            except ObjectDoesNotExist as snip_no_exist:
+                raise CustomerProfileUnavailable() from snip_no_exist
 
-        """Create a new Customer instance, given the accepted data."""
+        
 
         return Order.objects.create(**validated_data)

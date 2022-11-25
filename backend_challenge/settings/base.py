@@ -23,7 +23,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = +63moyr!(3^666l62(@^u$zt!s1)ofxg^
+DEBUG = True
+
+ALLOWED_HOSTS=['*']
+OIDC_RP_CLIENT_ID =1084835314828-s8npea9jce01udttaf8td5627p9k06fg.apps.googleusercontent.com
+OIDC_RP_CLIENT_SECRET= 4ZbM0GBZVisPA9YrBP3lFcr5   
+AFRICASTALKING_API_KEY = 4b687203c43211be0e43105531bf92d7d8ad44d778bdfcf869988c465049291e
 
 
 # SECURITY WARNING: don't run with debug turned on in production!

@@ -22,7 +22,7 @@ class Customer(TimeStampedModel):
             ),
         ],
     )
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,)
     code = models.CharField("code", max_length=15)
 
   

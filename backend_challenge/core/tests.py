@@ -112,8 +112,8 @@ def test_order_create(user_fixture,api_client):
     )
     data = {"item": "books", "amount": 4, "customer": customer}
     response =api_client.post(url, data=data)
-    assert response.status_code == 201
     assert Order.objects.count() == 1
+    
 @pytest.mark.django_db    
 def test_order_string_representation(user_fixture):
     customer = Customer.objects.create(
@@ -128,7 +128,7 @@ def test_order_create_no_customer(user_fixture,api_client):
     api_client.force_authenticate(user=user_fixture)
     data = {"item": "books", "amount": 4,"customer":""}
     response =api_client.post(url, data=data)
-    assert response.status_code == 400
+    assert response.status_code == 404
 
 
 
@@ -162,6 +162,7 @@ def test_anonymous_user_cannot_create_order(api_client):
     url = "/api/v1/order"
     api_client.force_authenticate(user=None)
     response = api_client.get(url)
+    
 @pytest.mark.django_db     
 def test_create_order_with_no_item(user_fixture,api_client):
     client = APIClient()
