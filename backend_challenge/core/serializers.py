@@ -23,7 +23,7 @@ class OrderSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Order
-        fields = ("item", "amount", "status","customer","category")
+        fields = ("created","code","item", "amount", "status","customer","category")
 
     def create(self, validated_data):
         """

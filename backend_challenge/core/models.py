@@ -171,8 +171,8 @@ from django.utils.crypto import get_random_string
 
 def generate_secret():
    
-    initial="API"
-    code=get_random_string(length=8, allowed_chars=string.ascii_lowercase + string.digits)
+    initial="AP"
+    code=get_random_string(length=6, allowed_chars=string.ascii_lowercase + string.digits)
     
     full_code=initial+code
     return full_code.upper()
@@ -202,6 +202,10 @@ class Customer(TimeStampedModel):
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE,)
     code = models.CharField("code", max_length=15)
+    
+    
+    def __str__(self):
+        return str(self.user.email)
 
   
 class Driver(TimeStampedModel):
@@ -264,6 +268,10 @@ class Order(TimeStampedModel):
         verbose_name=_("Order code"),
         db_index=True,null=True
     )
+    created = models.CharField(
+        max_length=100,
+        null=True
+    )
     status = models.CharField(
         max_length=16,
         choices=STATUS_CHOICE,
@@ -302,6 +310,10 @@ class Order(TimeStampedModel):
             kwargs['update_fields'] = list(kwargs['update_fields']) + ['last_modified']
         if not self.code:
             self.code=generate_secret()
+        if not self.created:
+            timecreated=self.added.strftime('%Y-%m-%d-%H:%M')
+            self.created=timecreated
+            
             
     
         super().save(**kwargs)

@@ -1,25 +1,18 @@
 from celery import shared_task
 from django.shortcuts import get_object_or_404
+from .exceptions import SmsException
 from rest_framework.exceptions import APIException, NotFound, ValidationError
 import africastalking
-from.models import Order
+from .models import Order
 
-class SmsException(Exception):
-    """Exception raised SMS is not sent"""
-    message = ""
 
-    def __init__(self, msg) -> None:
-        self.message = msg
+
+
     
 username = "sandbox"    # use 'sandbox' for development in the test environment
 api_key = "c24b10b049468747684e01f846e1a7420e106584c144d187b62d39fe667b6a78"
 
-class SmsException(Exception):
-    """Exception raised SMS is not sent"""
-    message = ""
 
-    def __init__(self, msg) -> None:
-        self.message = msg
     
 
 

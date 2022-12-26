@@ -23,6 +23,10 @@ from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import APIException, NotFound, ValidationError
 from django_filters.rest_framework import DjangoFilterBackend
+import csv
+from django.http import HttpResponse, HttpResponseForbidden
+from django.template.defaultfilters import slugify
+from django.utils.timezone import now
 
 class CustomerProfileException(NotFound):
     """Exception raised when customer profile  is not present in the data."""
@@ -98,6 +102,15 @@ class OrderViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend,filters.SearchFilter]
     filterset_fields = ['category', 'status']
     search_fields = ['code','category', 'status']
+    
+    # def get_queryset(self):
+    #     """
+    #     Optionally restricts the returned purchases to a given user,
+    #     by filtering against a `username` query parameter in the URL.
+    #     """
+        
+
+    #     return self.queryset
 
     @action(detail=True)
     def clone_order(self, request, pk=None):
@@ -116,7 +129,45 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Response({'status': 'order created from clone'})
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
+        
+    @action(detail=False)
+    def export(self,request):
+        
+        qs=self.queryset
+        model = qs.model
+        # date_str = now().strftime('%Y-%m-%d')
+        resp = Response(content_type='text/csv')
+        resp['Content-Disposition'] = 'attachment; filename=%s.csv' % (slugify(model.__name__))
+        writer = csv.writer(resp)
+        # Write headers to CSV file
+        headers = ["code","category",]
+            # opts = queryset.model._meta
+            # field_names = [field.name for field in opts.fields]
+        for field in model._meta.fields:
+            if field.name not in ('added','edited','id','code','category'):
+                headers.append(field.name)
+       
+        
+        writer.writerow(headers)
+        # Write data to CSV file
+        for obj in qs:
+            row = []
+            for field in headers:
+                if field in headers:
+                    val = getattr(obj, field)
+                    if callable(val):
+                        val = val()
+                    row.append(val)
+            writer.writerow(row)
+        # Return CSV file to browser as download
+        if resp: 
+            
+            return resp
+        else:
+             return Response(
+                {'status': 'failed', 'message': 'export failed'},
+                status=status.HTTP_410_GONE
+            )
     
             
            
