@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "rest_framework",
     "social_django",
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -121,6 +122,7 @@ REST_FRAMEWORK = {
        
      
     ],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 CACHES = {
     "default": {

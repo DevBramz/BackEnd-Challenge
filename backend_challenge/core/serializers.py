@@ -18,12 +18,12 @@ class CustomerSerializer(serializers.ModelSerializer):
         fields = ("phone", "code")
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderSerializer(serializers.HyperlinkedModelSerializer):
     customer = CustomerSerializer(read_only=True)
 
     class Meta:
         model = Order
-        fields = ("item", "amount", "customer")
+        fields = ("item", "amount", "status","customer","category")
 
     def create(self, validated_data):
         """
