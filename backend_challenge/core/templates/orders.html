@@ -1,0 +1,13 @@
+<html><body>
+    <h1>Profiles</h1>
+    <ul>
+        {% for profile in orders %}
+        <li>{{ profile.item }} {{ profile.code }} {{ profile.status }}</li>
+        {% endfor %}
+    </ul>
+    </body></html>
+ 
+ 
+ 
+    <!--  https://www.django-rest-framework.org/topics/html-and-forms/ -->
+

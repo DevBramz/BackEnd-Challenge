@@ -12,6 +12,7 @@ from pathlib import Path
 import django_heroku
 from decouple import Csv, config
 import dj_database_url
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,17 +27,17 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", cast=bool)
 
 
-
 # Application definition
 
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
-    "mozilla_django_oidc", 
+    "mozilla_django_oidc",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django.contrib.gis',
     "drf_yasg",
     "backend_challenge.core",
     "django",
@@ -44,7 +45,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "rest_framework",
     "social_django",
-    'django_filters',
+    "django_filters",
 ]
 
 MIDDLEWARE = [
@@ -58,10 +59,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost:8081',
-    'http://localhost:3000'
-)
+CORS_ORIGIN_WHITELIST = ("http://localhost:8081", "http://localhost:3000")
 
 ROOT_URLCONF = "backend_challenge.urls"
 
@@ -84,8 +82,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "backend_challenge.wsgi.application"
 
 
-
-ALLOWED_HOSTS = config('ALLOWED_HOSTS')
+ALLOWED_HOSTS = config("ALLOWED_HOSTS")
 # ALLOWED_HOSTS = ['*']
 # DATABASES = {
 #     "default": {
@@ -97,33 +94,55 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS')
 #         "PORT": 5432,
 #     }
 # }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '{}/db.sqlite3'.format(BASE_DIR),
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'geodjango',
+        'USER': 'ubuntu_user',
+        'PASSWORD': 'lucy',
+        'HOST': 'localhost',
+        'PORT': '5432'
     }
 }
 
 
-DATABASE_URL = os.environ.get('DATABASE_URL')
-db_from_env = dj_database_url.config(default=DATABASE_URL, conn_max_age=500, ssl_require=True)
-DATABASES['default'].update(db_from_env)
+DATABASE_URL = os.environ.get("DATABASE_URL")
+db_from_env = dj_database_url.config(
+    default=DATABASE_URL, conn_max_age=500, ssl_require=True
+)
+DATABASES["default"].update(db_from_env)
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-      'mozilla_django_oidc.contrib.drf.OIDCAuthentication', 
-      "rest_framework.authentication.SessionAuthentication"
-      
-      
+        "mozilla_django_oidc.contrib.drf.OIDCAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_RENDERER_CLASSES": [
-     	"rest_framework.renderers.JSONRenderer",
-    	"rest_framework.renderers.BrowsableAPIRenderer"
-    	
-       
-     
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
     ],
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 }
+
+TEMPLATES = [
+    {
+        # Template backend to be used, For example Jinja
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        # Directories for templates
+        "DIRS": [],
+        "APP_DIRS": True,
+        # options to configure
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
+
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.dummy.DummyCache",
@@ -166,13 +185,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
-STATIC_ROOT = 'staticfiles'
-STATIC_URL = '/static/'
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
-
-
+STATIC_ROOT = "staticfiles"
+STATIC_URL = "/static/"
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 
 
 AUTHENTICATION_BACKENDS = (
@@ -191,17 +206,17 @@ AUTHENTICATION_BACKENDS = (
 LOGIN_REDIRECT_URL = "/api/v1/customer"
 STATIC_URL = "/static/"
 
-CSRF_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SAMESITE = 'None'
-OIDC_DRF_AUTH_BACKEND = 'mozilla_django_oidc.auth.OIDCAuthenticationBackend'
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
+OIDC_DRF_AUTH_BACKEND = "mozilla_django_oidc.auth.OIDCAuthenticationBackend"
 OIDC_RP_SIGN_ALGO = "RS256"
 OIDC_OP_JWKS_ENDPOINT = "https://www.googleapis.com/oauth2/v3/certs"
 OIDC_OP_AUTHORIZATION_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth"
 OIDC_OP_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
 OIDC_OP_USER_ENDPOINT = "https://openidconnect.googleapis.com/v1/userinfo"
-OIDC_RP_CLIENT_ID =config("OIDC_RP_CLIENT_ID")
+OIDC_RP_CLIENT_ID = config("OIDC_RP_CLIENT_ID")
 OIDC_RP_CLIENT_SECRET = config("OIDC_RP_CLIENT_SECRET")
-CELERY_BROKER_URL= config("REDIS_URL")
+CELERY_BROKER_URL = config("REDIS_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"

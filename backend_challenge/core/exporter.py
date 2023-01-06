@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.template.defaultfilters import slugify
 from rest_framework.response import Response
 from rest_framework import status
+from .models import Customer, Order
 
 # class TitleSearchMixin:
 # def get_queryset(self):
@@ -42,7 +43,7 @@ class ExportViewMixin:
 
         """
         
-        model = qs.model
+        model = Order
         # date_str = now().strftime('%Y-%m-%d')
         resp = HttpResponse(content_type="text/csv")
         resp["Content-Disposition"] = "attachment; filename=%s.csv" % (
