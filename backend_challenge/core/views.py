@@ -133,15 +133,15 @@ class OrderViewSet(
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False)
-    def export_orders(self, request, *args, **kwargs):
-        """
-        Method to export orders
-        """
-        queryset = self.get_queryset()
-        print(queryset)
+    # @action(detail=False)
+    # def export_orders(self, request, *args, **kwargs):
+    #     """
+    #     Method to export orders
+    #     """
+    #     queryset = self.get_queryset()
+    #     print(queryset)
 
-        return self.export(queryset)
+    #     return self.export(queryset)
 
 
 class ExportOrdersView(APIView, ExportViewMixin):
@@ -251,9 +251,57 @@ class DeliveryViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing accounts.
     """
-
-    queryset = Delivery.objects.all()
     serializer_class = DeliverySerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ["status"]
+    search_fields = ["code",  "status"]
+    # renderer_classes = [TemplateHTMLRenderer]
+    # template_name="core/templates/deliveries.html"
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned purchases to a given user,
+        by filtering against a `username` query parameter in the URL.
+        """
+        qs = Delivery.objects.all()
+        # status = self.request.query_params.get("status")
+        # if status:
+        #     queryset = queryset.filter(status=status)
+        #     print(queryset)
+        # category = self.request.query_params.get("category")
+        # if category:
+        #     queryset = queryset.filter(category=category)
+        #     print(queryset)
+
+        return qs
+
+    # def get_serializer(self, queryset, many=True):
+    #     return self.serializer_class(
+    #         queryset,
+    #         many=many,
+    #     )
+
+    # def get(self, request, format=None):
+    #     deliveries = self.get_queryset()
+    #     print(de)
+    #     return Response({"unassigned_orders": deliveries})
+    
+    def list(self, request, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        print(queryset)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False)
+    def export_deliveries(self, request, *args, **kwargs):
+        """
+        Method to export orders
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        print(queryset)
+
+        return self.export(queryset)
 
     @action(detail=True)
     def clone_order(self, request, pk=None):
@@ -271,6 +319,14 @@ class DeliveryViewSet(viewsets.ModelViewSet):
             return Response(data)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+    
+            
+            
+            
+            
+            
+        
 
 
 class RouteViewSet(viewsets.ModelViewSet):

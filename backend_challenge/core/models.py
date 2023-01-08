@@ -76,6 +76,7 @@ class Driver(TimeStampedModel):
     national_id = models.PositiveIntegerField(db_index=True, unique=True)
     name = models.CharField("name", max_length=20)
     capacity = models.PositiveIntegerField(null=True)
+    # completeBefore = models.DateTimeField(null=True)
 
     def __str__(self):
         return self.name
@@ -248,6 +249,15 @@ class RouteSettings(TimeStampedModel):
 
 
 class Delivery(TimeStampedModel):
+    STATUS_DRAFT = "draft"
+    STATUS_PENDING = "pending"
+    STATUS_DElIVERED = "delivered"
+    STATUS_CHOICE = (
+        (STATUS_DRAFT, _("draft")),
+        (STATUS_PENDING, _("pending")),
+        (STATUS_DElIVERED, _("delivered")),
+        
+    )
     code = models.CharField(max_length=100, blank=True)
     delivery_adress = models.PointField()
     address = models.CharField(max_length=100, blank=True, null=True)
@@ -257,6 +267,7 @@ class Delivery(TimeStampedModel):
         null=True,
     )
     quantity = models.PositiveIntegerField(default=1)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICE, default="pending")
 
     # @property
     # def latlong(self):

@@ -86,16 +86,18 @@ class Route:
             0,
             1,
             8,
-            8,
             4,
             4,
-            8,
+            4,
+            4,
             1,
             2,
+            4,
+            3,
         ]
 
         data["num_vehicles"] = 4
-        data["vehicle_capacities"] = [15] * 4
+        data["vehicle_capacities"] = [20] * 4
         print(data["vehicle_capacities"])
 
         data["depot"] = 0
@@ -107,13 +109,21 @@ class Route:
         total_distance = 0
         total_load = 0
         routes = []
+        paths=[]
+       
+
         for vehicle_id in range(data["num_vehicles"]):
+           
             index = routing.Start(vehicle_id)
-            plan_output = "Route for vehicle {}:\n".format(vehicle_id)
+            plan_output = "Route {} for vehicle:".format(vehicle_id)
             route_distance = 0
             route_load = 0
+            path = [manager.IndexToNode(index)]
             while not routing.IsEnd(index):
+                dct={}
+               
                 node_index = manager.IndexToNode(index)
+               
                 route_load += data["demands"][node_index]
                 plan_output += " {0} Load({1}) -> ".format(node_index, route_load)
                 previous_index = index
@@ -121,23 +131,40 @@ class Route:
                 route_distance += routing.GetArcCostForVehicle(
                     previous_index, index, vehicle_id
                 )
-            plan_output += " {0} Load({1})\n".format(
-                manager.IndexToNode(index), route_load
-            )
-            plan_output += "Distance of the route: {}m\n".format(route_distance)
+                path.append(manager.IndexToNode(index))
+                
+    
+   
+
+            paths.append(path)
+            
+            
+            plan_output += "Distance of the route: {}miles".format(route_distance)
 
             plan_output += "Load of the route: {}\n".format(route_load)
+            
             routes.append(plan_output)
-            print(plan_output)
+            
+            
+        
+        # for i in route:
+        #     first = overall_locations[route[i]]
+        #     print(first)
+        #     route_path_cords.append(first)
+        #     print(plan_output)
 
             total_distance += route_distance
             total_load += route_load
         print("Total distance of all routes: {}m".format(total_distance))
         print("Total load of all routes: {}".format(total_load))
-        print(routes)
+        
+     
+            
+        
         return (
             routes,
             total_load,
+            paths
         )
 
     def generate_routes(self):
@@ -181,6 +208,17 @@ class Route:
             True,  # start cumul to zero
             "Capacity",
         )
+         # Add Distance constraint.
+        dimension_name = 'Distance'
+        routing.AddDimension(
+            transit_callback_index,
+            0,  # no slack
+            3000,  # vehicle maximum travel distance
+            True,  # start cumul to zero
+            dimension_name)
+        distance_dimension = routing.GetDimensionOrDie(dimension_name)
+        distance_dimension.SetGlobalSpanCostCoefficient(100)
+
 
         # Setting first solution heuristic.
         search_parameters = pywrapcp.DefaultRoutingSearchParameters()

@@ -1,0 +1,61 @@
+from ortools.sat.python import cp_model
+
+
+def main():
+    # Data
+    costs = [
+        [15, 15, 15, 15],
+        [35, 35, 35, 35],
+        [45, 45, 40, 45],
+        [110, 110, 110, 110],
+        [50, 50, 50, 50],
+    ]
+    num_workers = len(costs)
+    num_tasks = len(costs[0])
+
+    # Model
+    model = cp_model.CpModel()
+
+    # Variables
+    x = []
+    for i in range(num_workers):
+        t = []
+        for j in range(num_tasks):
+            t.append(model.NewBoolVar(f'x[{i},{j}]'))
+        x.append(t)
+
+    # Constraints
+    # Each worker is assigned to at most one task.
+    for i in range(num_workers):
+        model.AddAtMostOne(x[i][j] for j in range(num_tasks))
+
+    # Each task is assigned to exactly one worker.
+    for j in range(num_tasks):
+        model.AddExactlyOne(x[i][j] for i in range(num_workers))
+
+    # Objective
+    objective_terms = []
+    for i in range(num_workers):
+        for j in range(num_tasks):
+            objective_terms.append(costs[i][j] * x[i][j])
+    model.Minimize(sum(objective_terms))
+
+    # Solve
+    solver = cp_model.CpSolver()
+    status = solver.Solve(model)
+
+    # Print solution.
+    if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
+        print(f'Total cost = {solver.ObjectiveValue()}')
+        print()
+        for i in range(num_workers):
+            for j in range(num_tasks):
+                if solver.BooleanValue(x[i][j]):
+                    print(
+                        f'Worker {i} assigned to task {j} Cost = {costs[i][j]}')
+    else:
+        print('No solution found.')
+
+
+if __name__ == '__main__':
+    main()
