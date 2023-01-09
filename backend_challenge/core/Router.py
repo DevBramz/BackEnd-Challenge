@@ -34,13 +34,13 @@ class Route:
     deliveries = None
     start_adress = None
     end_adress = None
-    vehicle_capacity = 15
+    capacity = 0
 
     def __init__(self, num, deliveries, start, capacity):
         self.num_vehicles = num
         self.deliveries = deliveries
         self.start_adress = start
-        self.vehicle_capacity = capacity
+        self.capacity = capacity
 
     def compute_distance_matrix(self, overall_locations):
         # This computes the distance matrix by using GOOGLE MATRIX API
@@ -92,16 +92,16 @@ class Route:
             3,
         ]
 
-        data["num_vehicles"] = 4
-        data["vehicle_capacities"] = [15] * 4
+        data["num_vehicles"] = self.num_vehicles
+        data["vehicle_capacities"] = [self.capacity]* self.num_vehicles
         print(data["vehicle_capacities"])
 
         data["depot"] = 0
         return data
 
     def routing_solution(self, data, manager, routing, solution):
-        """Prints solution on console."""
-        print(f"Objective: {solution.ObjectiveValue()}")
+        """returns rouing soluting """
+    
         total_distance = 0
         total_load = 0
         routes = []

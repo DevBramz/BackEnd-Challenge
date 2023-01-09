@@ -9,7 +9,7 @@ def main():
         [45, 45, 40, 45],
         [110, 110, 110, 110],
         [50, 50, 50, 50],
-    ]
+    ]# distance matrix
     num_workers = len(costs)
     num_tasks = len(costs[0])
 
@@ -57,5 +57,4 @@ def main():
         print('No solution found.')
 
 
-if __name__ == '__main__':
-    main()
+]

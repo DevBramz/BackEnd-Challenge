@@ -19,8 +19,10 @@ class RouteSettingsSerializer(serializers.ModelSerializer):
         """returns route route path"""
         deliveries = Delivery.objects.filter(status="pending")
         start = [-1.2841, 36.8155]
+        capacity=25
+        num_vehicles=6
 
-        route = Route(4, deliveries, start, 15)  # Route Object
+        route = Route(num_vehicles, deliveries, start, capacity)  # Route Object
 
         return route.generate_routes()
 
