@@ -35,7 +35,7 @@ class Route:
     start_adress = None
     end_adress = None
     vehicle_capacity = 15
-    locations = [(0, 0)]
+    locations = []
     # demands = [0]
 
     def __init__(self, num, deliveries, start, capacity, locations):
@@ -61,26 +61,28 @@ class Route:
     #             ]["distance"]["value"]
 
     #     return distance_matrix
+    def all_waypoints(self):
+        # returns a list of waypoints inclufing the start adress and end adress in optimization settings
+        waypoints = [self.start_adress]+[delivery.location for delivery in self.deliveries]
+        return waypoints
+        
 
-    def compute_geodisic_distance_matrix(self, locations):
+    def compute_geodisic_distance_matrix(self):
         # This computes the distance matrix by using geopy
 
-        waypoints = [self.start_adress]
-
-        for location in locations:
-            waypoints.append(location)
-
+        
+        waypoints=self.all_waypoints()
         distance_matrix = [
             [(int(geodesic(p1, p2).miles)) for p2 in waypoints] for p1 in waypoints
         ]
-        print(waypoints)
         return distance_matrix
 
     def create_data_model(self):
         """Stores the data for the problem."""
 
         data = {}
-        data["distance_matrix"] = self.compute_geodisic_distance_matrix(self.locations)
+        data["distance_matrix"] = self.compute_geodisic_distance_matrix()
+        # This computes the quantity of the orders distance matrix by using geopy
 
         data["demands"] = [
             0,
@@ -111,17 +113,29 @@ class Route:
         routes = []
         paths = []
 
-        operations = []
+        operationsi = []
+        path_cordinates = []
         for vehicle_id in range(data["num_vehicles"]):
+            operations = {}
+            
 
             index = routing.Start(vehicle_id)
             plan_output = "Route {} for vehicle:".format(vehicle_id)
             route_distance = 0
             route_load = 0
+            route_id=vehicle_id+1
             path = [manager.IndexToNode(index)]
+           
+            locations=self.all_waypoints()
+            
+           
+            operations["path"]=path
+            
             while not routing.IsEnd(index):
 
                 node_index = manager.IndexToNode(index)
+                
+               
 
                 route_load += data["demands"][node_index]
                 plan_output += " {0} Load({1}) -> ".format(node_index, route_load)
@@ -130,39 +144,40 @@ class Route:
                 route_distance += routing.GetArcCostForVehicle(
                     previous_index, index, vehicle_id
                 )
+                operations["route_id"]=route_id
+                operations["load"]=route_load
+                operations["dis"]=route_distance
                 path.append(manager.IndexToNode(index))
-                operation = {
-                    "destination": manager.IndexToNode(index),
-                    "capacity": data["demands"][manager.IndexToNode(index)],
-                }
-                operations.append(operation)
-            print(operations)
+            
+          
 
-            paths.append(path)
+
+           
+
+            path_cordinates=[locations[i] for i in path]
+            operations["route"]=path_cordinates
+            
 
             plan_output += "Distance of the route: {}miles".format(route_distance)
 
             plan_output += "Load of the route: {}\n".format(route_load)
 
             routes.append(plan_output)
+            operationsi.append(operations)
+            
+           
 
-            roro=[(i, path) for (i,path) in enumerate(paths)]
             
             
-               
             
-
+            print(path)
             total_distance += route_distance
             total_load += route_load
+            
         print("Total distance of all routes: {}m".format(total_distance))
         print("Total load of all routes: {}".format(total_load))
 
-        return (
-            routes,
-            total_load,
-            paths,
-            roro
-        )
+        return (routes, total_load,total_distance,operationsi)
 
     def generate_routes(self):
         """Solve the CVRP problem."""
@@ -235,37 +250,37 @@ class Route:
             return self.routing_solution(data, manager, routing, solution)
 
 
-locat = [
-    (456, 320),  # location 0 - the depot
-    (228, 0),  # location 1
-    (912, 0),  # location 2
-    (0, 80),  # location 3
-    (114, 80),  # location 4
-    (570, 160),  # location 5
-    (798, 160),  # location 6
-    (342, 240),  # location 7
-    (684, 240),  # location 8
-    (570, 400),  # location 9
-    (912, 400),  # location 10
-    (114, 480),  # location 11
-    (228, 480),  # location 12
-    (342, 560),  # location 13
-    (684, 560),  # location 14
-    (0, 640),  # location 15
-    (798, 640),
-]
+# locat = [
+#     (456, 320),  # location 0 - the depot
+#     (228, 0),  # location 1
+#     (912, 0),  # location 2
+#     (0, 80),  # location 3
+#     (114, 80),  # location 4
+#     (570, 160),  # location 5
+#     (798, 160),  # location 6
+#     (342, 240),  # location 7
+#     (684, 240),  # location 8
+#     (570, 400),  # location 9
+#     (912, 400),  # location 10
+#     (114, 480),  # location 11
+#     (228, 480),  # location 12
+#     (342, 560),  # location 13
+#     (684, 560),  # location 14
+#     (0, 640),  # location 15
+#     (798, 640),
+# ]
 
 
-overall_locations = [
-    (-1.393864, 36.744238),  # RONGAI
-    (-1.205604, 36.779606),  # RUAKA
-    (-1.283922, 36.798107),  # Kilimani
-    (-1.366859, 36.728069),  # langata
-    (-1.311752, 36.698598),  # karen1  # karen2
-    (-1.3362540729230734, 36.71637587249404),
-    (-1.1752106333542798, 36.75964771015464),  # Banana1
-    (-1.1773237686269944, 36.760334355612045),  # Banana2
-]  #
+# overall_locations = [
+#     (-1.393864, 36.744238),  # RONGAI
+#     (-1.205604, 36.779606),  # RUAKA
+#     (-1.283922, 36.798107),  # Kilimani
+#     (-1.366859, 36.728069),  # langata
+#     (-1.311752, 36.698598),  # karen1  # karen2
+#     (-1.3362540729230734, 36.71637587249404),
+#     (-1.1752106333542798, 36.75964771015464),  # Banana1
+#     (-1.1773237686269944, 36.760334355612045),  # Banana2
+# ]  #
 
 
 # mato = compute_distance_matrix(overall_locations)

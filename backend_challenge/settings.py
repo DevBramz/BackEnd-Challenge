@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "backend_challenge.core",
     "django",
+    "leaflet",
     "corsheaders",
     "django_extensions",
     "rest_framework",

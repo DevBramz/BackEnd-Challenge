@@ -277,8 +277,8 @@ class Delivery(TimeStampedModel):
     def location(self):
         lat = self.delivery_adress.y
         long = self.delivery_adress.x
-        tple = (lat, long)
-        return tple
+        location_list = [lat, long]
+        return location_list
 
     def save(self, **kwargs):
         if "update_fields" in kwargs and "last_modified" not in kwargs["update_fields"]:

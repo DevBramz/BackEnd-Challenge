@@ -19,33 +19,19 @@ class RouteSettingsSerializer(serializers.ModelSerializer):
         deliveries = Delivery.objects.filter(status="pending")
         print(deliveries.count)
         adress = obj.start_address
-        start = (-1.2841,36.8155)
+        start = [-1.2841, 36.8155]
         adress2 = obj.end_address
-        end = (adress2.y, adress2.x)
-        # locations = [
-        #     (-1.393864, 36.744238),  # RONGAI
-        #     (-1.205604, 36.779606),  # RUAKA
-        #     (-1.283922, 36.798107),  # Kilimani
-        #     (-1.366859, 36.728069),  # langata
-        #     (-1.311752, 36.698598),  # karen1 
-        #     (-1.3362540729230734, 36.71637587249404), # karen2
-        #     (-1.1752106333542798, 36.75964771015464),  # Banana1
-        #     (-1.1773237686269944, 36.760334355612045),  # Banana2
-        # ]  #
+        end = [adress2.y, adress2.x]#Convert to a list of la,long
         
         locations=[delivery.location for delivery in deliveries]
     
 
-        # for delivery in deliveries:
-        #     locations.append(delivery.location)
-        # print(locations)
-
-        route = Route(4, deliveries, start, 15, locations)
+        route = Route(4, deliveries, start, 15, locations)#Route Object
 
         return route.generate_routes()
 
 
-# create a tuple
+
 
 
 class DeliverySerializer(serializers.ModelSerializer):
