@@ -1,12 +1,8 @@
 import string
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
-from django.utils.translation import gettext_lazy as _, pgettext_lazy
+from django.utils.translation import gettext_lazy as _
 from django.db import models
-from mozilla_django_oidc.auth import OIDCAuthenticationBackend
-from datetime import date
-
-# from django.contrib.auth.models import Group
 from django.utils.crypto import get_random_string
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
@@ -25,9 +21,6 @@ def generate_secret():
 
     full_code = initial + code
     return full_code.upper()
-
-
-# driver_group, created = Group.objects.get_or_create(name="Doctor")
 
 
 class TimeStampedModel(models.Model):
@@ -76,63 +69,9 @@ class Driver(TimeStampedModel):
     national_id = models.PositiveIntegerField(db_index=True, unique=True)
     name = models.CharField("name", max_length=20)
     capacity = models.PositiveIntegerField(null=True)
-    # completeBefore = models.DateTimeField(null=True)
 
     def __str__(self):
         return self.name
-
-
-class OrderShipment(models.Model):
-
-    PENDING = "PENDING"
-    STARTED = "STARTED"
-    IN_PROGRESS = "IN_PROGRESS"
-    COMPLETED = "COMPLETED"
-    STATUSES = (
-        (PENDING, PENDING),
-        (STARTED, STARTED),
-        (IN_PROGRESS, IN_PROGRESS),
-        (COMPLETED, COMPLETED),
-    )
-
-    shipment_code = models.CharField(max_length=50, db_index=True, unique=True)
-
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-    start_address = models.CharField(max_length=255)
-    end_address = models.CharField(max_length=255)
-    status = models.CharField(max_length=20, choices=STATUSES, default="PENDING")
-
-    driver = models.ForeignKey(
-        Driver,
-        null=True,
-        blank=True,
-        on_delete=models.DO_NOTHING,
-        related_name="driver_ordershipments",
-    )
-    scheduled_at = models.DateTimeField(null=True, blank=True)
-
-    def __str__(self):
-        return self.shipment_code
-
-    # def get_absolute_url(self):
-    #     return reverse('core:or_detail', kwargs={'trip_id': self.id})
-
-    def assign_delivery_code(self):
-        initial = "DEL"
-        code = self.id
-        zeros = 000
-        code = f"{initial}-{zeros}{self.id}"
-        return code
-
-    def save(self, **kwargs):
-        if "update_fields" in kwargs and "updated" not in kwargs["update_fields"]:
-            kwargs["update_fields"] = list(kwargs["update_fields"]) + ["updated"]
-        if not self.shipment_code:
-            self.shipment_code = assign_delivery_code()
-        if not self.created:
-            self.created = self.created.strftime("%Y-%m-%d-%H:%M")
-        super().save(**kwargs)
 
 
 class Order(TimeStampedModel):
@@ -190,18 +129,6 @@ class Order(TimeStampedModel):
         )
         return code.upper().translate(tr)
 
-    def assign_code(self):
-        # This omits some character pairs completely because they are hard to read even on screens (1/I and O/0)
-        # and includes only one of two characters for some pairs because they are sometimes hard to distinguish in
-        # handwriting (2/Z, 4/A, 5/S, 6/G). This allows for better detection e.g. in incoming wire transfers that
-        # might include OCR'd handwritten text
-        charset = list("ABCDEFGHJKLMNPQRSTUVWXYZ3789")
-        iteration = 0
-        # length = settings.ENTROPY['order_code']
-        while True:
-            code = get_random_string(length=16, allowed_chars=charset)
-            iteration += 1
-        return code
 
     def save(self, **kwargs):
         if "update_fields" in kwargs and "last_modified" not in kwargs["update_fields"]:
@@ -256,7 +183,6 @@ class Delivery(TimeStampedModel):
         (STATUS_DRAFT, _("draft")),
         (STATUS_PENDING, _("pending")),
         (STATUS_DElIVERED, _("delivered")),
-        
     )
     code = models.CharField(max_length=100, blank=True)
     delivery_adress = models.PointField()
@@ -269,10 +195,6 @@ class Delivery(TimeStampedModel):
     quantity = models.PositiveIntegerField(default=1)
     status = models.CharField(max_length=20, choices=STATUS_CHOICE, default="pending")
 
-    # @property
-    # def latlong(self):
-    #     location = [coord for coord in self.location]
-    #     return location[::-1]
     @property
     def location(self):
         lat = self.delivery_adress.y
@@ -291,6 +213,4 @@ class Delivery(TimeStampedModel):
     def __str__(self):
         return str(self.code)
 
-    # @property
-    # def get_route_path(self):
-    #     return
+   

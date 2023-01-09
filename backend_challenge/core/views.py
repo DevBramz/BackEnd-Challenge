@@ -25,8 +25,6 @@ from django.template.defaultfilters import slugify
 from rest_framework.reverse import reverse
 from django.shortcuts import redirect
 
-# from .tsm import main
-
 
 class CustomerProfileException(NotFound):
     """Exception raised when customer profile  is not present in the data."""
@@ -50,12 +48,7 @@ class Customer_Create(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# Create your views here.
-
-
 class OrderListCreateAPIView(ListCreateAPIView):
-
-    """"""
 
     model = Order
     serializer_class = OrderSerializer
@@ -133,16 +126,6 @@ class OrderViewSet(
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    # @action(detail=False)
-    # def export_orders(self, request, *args, **kwargs):
-    #     """
-    #     Method to export orders
-    #     """
-    #     queryset = self.get_queryset()
-    #     print(queryset)
-
-    #     return self.export(queryset)
-
 
 class ExportOrdersView(APIView, ExportViewMixin):
     """
@@ -159,7 +142,7 @@ class ExportOrdersView(APIView, ExportViewMixin):
     def get_queryset(self):
         """
         Optionally restricts the returned purchases to a given user,
-        by filtering against a `username` query parameter in the URL.
+        by filtering against a ` query parameter in the URL.
         """
         queryset = Order.objects.all()
         status = self.request.query_params.get("status")
@@ -183,78 +166,16 @@ class ExportOrdersView(APIView, ExportViewMixin):
         orders = self.get_queryset()
         return Response({"orders": orders}, template_name="orders.html")
 
-    # def export(self,request, *args, **kwargs):
-    #     response = HttpResponse(content_type='text/csv')
-    #     response['Content-Disposition'] = 'attachment; filename="export.csv"'
 
-    #     # serializer = self.get_serializer(
-    #     #         Order.objects.all(),
-    #     #         many=True
-    #     #     )
-    #     # qs=Order.objects.all()
-    #     # category = self.request.query_params.get('category')
-    #     # if category is not None:
-    #     #     qs = qs.filter(category=category)
-
-    #     model=Order
-    #     resp = HttpResponse(content_type="text/csv")
-    #     resp["Content-Disposition"] = "attachment; filename=%s.csv" % (
-    #         slugify(model.__name__)
-    #     )
-    #     writer = csv.writer(resp)
-    #     # Write headers to CSV file
-    #     headers = [
-    #         "code",
-    #         "category",
-    #     ]
-    #     # opts = queryset.model._meta
-    #     # field_names = [field.name for field in opts.fields]
-
-    #     for field in model._meta.fields:
-    #         if field.name not in ("added", "edited", "id", "code", "category"):
-    #             headers.append(field.name)
-
-    #     writer.writerow(headers)
-    #     # Write data to CSV file
-    #     for obj in self.get_queryset():
-    #         row = []
-    #         for field in headers:
-    #             if field in headers:
-    #                 val = getattr(obj, field)
-    #                 if callable(val):
-    #                     val = val()
-    #                 row.append(val)
-    #         writer.writerow(row)
-    #     # Return CSV file to browser as download
-    #     if resp:
-
-    #         return resp
-    #     else:
-    #         return Response(
-    #             {"status": "failed", "message": "export failed"},
-    #             status=status.HTTP_410_GONE,
-    # )
-
-
-# Routes API is the next generation, performance optimized version of the existing Directions API and Distance Matrix API. It helps you find the ideal route from A to Z, calculates ETAs and distances for matrices of origin and destination locations, and also offers new features.
-#     if mode not in ["driving", "walking", "bicycling", "transit"]:
-#             raise ValueError("Invalid travel mode.")
-# @api_view(["GET"])
-# @permission_classes([AllowAny])
-# def routing_view(request, format=None):
-#     content = {
-#         "routes":,  # `django.contrib.auth.User` instance.
-#     }
-
-#     return Response(content)
 class DeliveryViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing accounts.
     """
+
     serializer_class = DeliverySerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ["status"]
-    search_fields = ["code",  "status"]
+    search_fields = ["code", "status"]
     # renderer_classes = [TemplateHTMLRenderer]
     # template_name="core/templates/deliveries.html"
 
@@ -264,35 +185,21 @@ class DeliveryViewSet(viewsets.ModelViewSet):
         by filtering against a `username` query parameter in the URL.
         """
         qs = Delivery.objects.all()
-        # status = self.request.query_params.get("status")
-        # if status:
-        #     queryset = queryset.filter(status=status)
-        #     print(queryset)
-        # category = self.request.query_params.get("category")
-        # if category:
-        #     queryset = queryset.filter(category=category)
-        #     print(queryset)
 
         return qs
 
-    # def get_serializer(self, queryset, many=True):
-    #     return self.serializer_class(
-    #         queryset,
-    #         many=many,
-    #     )
+    def get_serializer(self, queryset, many=True):
+        return self.serializer_class(
+            queryset,
+            many=many,
+        )
 
-    # def get(self, request, format=None):
-    #     deliveries = self.get_queryset()
-    #     print(de)
-    #     return Response({"unassigned_orders": deliveries})
-    
     def list(self, request, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        print(queryset)
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=False)
     def export_deliveries(self, request, *args, **kwargs):
         """
@@ -315,18 +222,14 @@ class DeliveryViewSet(viewsets.ModelViewSet):
         delivery.save()
 
         if delivery:
-            data = {"order_id": delivery.id, "order_code": delivery.code,"url":reverse('core:delivery-detail', args=[pk], request=request)}
+            data = {
+                "order_id": delivery.id,
+                "order_code": delivery.code,
+                "url": reverse("core:delivery-detail", args=[pk], request=request),
+            }
             return Response(data)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
-    
-            
-            
-            
-            
-            
-        
 
 
 class RouteViewSet(viewsets.ModelViewSet):
@@ -336,10 +239,3 @@ class RouteViewSet(viewsets.ModelViewSet):
 
     queryset = RouteSettings.objects.all()
     serializer_class = RouteSettingsSerializer
-    
-
-    
-
-    
-    
-
