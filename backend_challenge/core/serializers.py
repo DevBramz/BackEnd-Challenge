@@ -43,7 +43,7 @@ class CustomerProfileUnavailable(APIException):
     """Exception raised when customer profile  is not present in the data."""
 
     status_code = 404
-    # default_detail = 'Service temporarily unavailable, try again later.'
+    default_detail = 'Profie could not be found.'
 
 
 class CustomerSerializer(serializers.ModelSerializer):
