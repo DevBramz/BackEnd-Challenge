@@ -5,7 +5,7 @@ from rest_framework.exceptions import APIException, NotFound, ValidationError
 
 from .models import Customer, Order, RouteSettings, Delivery
 from django.core.exceptions import ObjectDoesNotExist
-from .Router import Route
+from .Router import CVRP
 
 
 class RouteSettingsSerializer(serializers.ModelSerializer):
@@ -21,8 +21,8 @@ class RouteSettingsSerializer(serializers.ModelSerializer):
         start = [-1.2841, 36.8155]
         capacity = obj.vehicle_capacity
         # num_drivers=Driver.objects.filter(available=True)
-        num_vehicles=6
-        route = Route(num_vehicles, deliveries, start, capacity)  # Route Object
+        num_vehicles = obj.num_vehicles
+        route = CVRP(num_vehicles, deliveries, start, capacity)  # Route Object
 
         return route.generate_routes()
 
@@ -43,7 +43,7 @@ class CustomerProfileUnavailable(APIException):
     """Exception raised when customer profile  is not present in the data."""
 
     status_code = 404
-    default_detail = 'Profie could not be found.'
+    default_detail = "Profie could not be found."
 
 
 class CustomerSerializer(serializers.ModelSerializer):

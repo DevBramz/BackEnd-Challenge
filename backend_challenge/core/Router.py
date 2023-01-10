@@ -10,6 +10,8 @@ import numpy as np
 from geopy.distance import great_circle, geodesic
 import polyline
 
+from backend_challenge.core.exceptions import SmsException,RoutingException
+
 
 """Capacited Vehicles Routing Problem (CVRP)."""
 
@@ -17,7 +19,7 @@ from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 
 
-class Route:  # pragma: no cover
+class CVRP:  # pragma: no cover
     # gmaps = googlemaps.Client(key="WWWWW")
 
     # This computes the distance matrix by using GOOGLE MATRIX API
@@ -140,8 +142,6 @@ class Route:  # pragma: no cover
             route_data["route"] = path_cordinates
             route_data["encoded_polyline"] = encoded_polyline
 
-            
-
             plan_output += "Distance of the route: {}miles".format(route_distance)
 
             plan_output += "Load of the route: {}\n".format(route_load)
@@ -155,7 +155,6 @@ class Route:  # pragma: no cover
 
             total_distance += route_distance
             total_load += route_load
-
             payload = {
                 "total_distance": total_distance,
                 "total_load": total_load,
@@ -237,6 +236,8 @@ class Route:  # pragma: no cover
         # Print solution on console.
         if solution:
             return self.routing_solution(data, manager, routing, solution)
+            
         else:
-            msg = "Could not generate route path"
-            return {"msg": msg}
+            #hould return routing failed and log the error(logger.info(routing.status()))
+            raise RoutingException
+        
