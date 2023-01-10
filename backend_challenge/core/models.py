@@ -8,10 +8,6 @@ from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
 
 
-def get_number(self):
-    return "{0}-{1}".format(str(self.number)[:4], str(self.number)[4:])
-
-
 def generate_secret():
 
     initial = "DEL"
@@ -129,7 +125,6 @@ class Order(TimeStampedModel):
         )
         return code.upper().translate(tr)
 
-
     def save(self, **kwargs):
         if "update_fields" in kwargs and "last_modified" not in kwargs["update_fields"]:
             kwargs["update_fields"] = list(kwargs["update_fields"]) + ["last_modified"]
@@ -156,7 +151,9 @@ class RouteSettings(TimeStampedModel):
     class Mode(models.TextChoices):
         Distance = "Minimum Distance", _("Min Distance")
         Arrival = "Ensure Arrival Time", _("Arrival Time")
-        Balance = "Balance Distance and Arrival Times ", _("Balance Distance and Arrival Time")
+        Balance = "Balance Distance and Arrival Times ", _(
+            "Balance Distance and Arrival Time"
+        )
 
     vehicle_utilization = models.CharField(
         max_length=2,
@@ -218,5 +215,3 @@ class Delivery(TimeStampedModel):
 
     def __str__(self):
         return str(self.code)
-
-   
