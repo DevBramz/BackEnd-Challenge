@@ -188,11 +188,11 @@ class DeliveryViewSet(viewsets.ModelViewSet):
 
         return qs
 
-    def get_serializer(self, queryset, many=True):
-        return self.serializer_class(
-            queryset,
-            many=many,
-        )
+    # def get_serializer(self, queryset, many=True):
+    #     return self.serializer_class(
+    #         queryset,
+    #         many=many,
+    #     )
 
     def list(self, request, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
