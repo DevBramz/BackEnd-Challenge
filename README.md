@@ -29,18 +29,14 @@ Customers gets message after order created sucessfully(Asynchronous  Task) <br /
 #### Question Endpoints.
 | API Endpoint  | Description | Methods |
 | ------------- | ------------- | ------------- |
-| /oidc/authenticate/  | Authentication | GET  |
-  /api/v1/customer  | create customer  | POST |
-| /api/v1/delivery  | Get all orders   | GET  |
- /api/v1/order | Customer posts order  | POST  |
-/api/v1/route/
-api/v1/route/
-api/v1/route
-api/v1/route/
-api/v1/route/
-api/v1/
-api/v1/
-api/v1/delivery/
+| /api/v1/delivery/ |Get all deliveries  | GET  |
+  api/v1/delivery/  | create customer  | POST |
+| /api/v1/delivery/1  |Detail Delivery  | GET  |
+  /api/v1/route/Create| Create Rout || POST  |
+ /api/v1/route/| Create Route | POST  |
+/api/v1/route/1 | Route Detail | GET |
+https://developers.google.com/maps/documentation/javascript/examples/polyline-simple
+
 api/v1/delivery
 api/v1/delivery/export_deliveries
 api/v1/delivery/export_deliveries
@@ -281,6 +277,9 @@ api/v1/delivery/
     "end_address": "SRID=4326;POINT (36.798107 -1.283922)"
 }
 ```
+
+https://developers.google.com/maps/documentation/javascript/examples/polyline-simple
+
 
 ## Getting Started
 To get started:

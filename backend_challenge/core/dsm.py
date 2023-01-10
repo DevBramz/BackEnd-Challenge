@@ -245,6 +245,12 @@ class Router:
             return self.construct_response(data, manager, routing, solution)
         else:
             return "ERROR"
+    
+    
+    # https://stackoverflow.com/questions/59527019/using-capacity-constraint-with-pickup-and-delivery
+    # https://groups.google.com/g/or-tools-discuss/c/-smvHltBSvs
+    # https://docs.routific.com/docs/api-endpoints
+
         
     # https://stackoverflow.com/questions/45733763/pytest-run-tests-parallel   
           # class OrderShipmentSerializer(serializers.HyperlinkedModelSerializer):
@@ -417,6 +423,16 @@ class Router:
 # maximum no of deliveries;proof of delivery, Delivery_window,no of vehicldes
 # No entrance windows, bad weather, high traffic hours, and unexpected route obstructions can all significantly slow down your delivery. As a result, it’s critical to use dynamic delivery route optimization software that calculates and assigns the most effective delivery routes.
 # https://sandesh-deshmane.medium.com/architecture-and-design-principles-for-online-food-delivery-system-33bfda73785d
+# https://stackoverflow.com/questions/13122020/google-map-api-drawn-polyline-with-encoded-points
+# https://googlemaps.github.io/js-polyline-codec/index.html
+# https://stackoverflow.com/questions/50332798/drawing-multiple-polylines-in-google-maps-javascript-api
+# https://googlemaps.github.io/js-polyline-codec/index.html
+# https://googlemaps.github.io/js-polyline-codec/index.html
+#  total demand is greater than the total vehicle capacity. 
+
+
+
+
 # Set your preferred optimization goal.
 # Minimum distance
 # Minimum time

@@ -8,6 +8,7 @@ from ortools.constraint_solver import pywrapcp
 import googlemaps
 import numpy as np
 from geopy.distance import great_circle, geodesic
+import polyline
 
 
 """Capacited Vehicles Routing Problem (CVRP)."""
@@ -42,7 +43,7 @@ class Route:  # pragma: no cover
         self.capacity = capacity
 
     def compute_distance_matrix(self, overall_locations):
-        """ This computes the distance matrix by using GOOGLE MATRIX API """
+        """This computes the distance matrix by using GOOGLE MATRIX API"""
         response = self.gmaps.distance_matrix(
             overall_locations[0:], overall_locations[0:], mode="driving"
         )
@@ -64,7 +65,7 @@ class Route:  # pragma: no cover
 
     def compute_geodisic_distance_matrix(self):
         """computes the distance matrix by using geopy"""
-      
+
         waypoints = self.all_waypoints()
         distance_matrix = [
             [(int(geodesic(p1, p2).miles)) for p2 in waypoints] for p1 in waypoints
@@ -104,7 +105,7 @@ class Route:  # pragma: no cover
         total_load = 0
         routes = []
 
-        operations= []
+        operations = []
         path_cordinates = []
         for vehicle_id in range(data["num_vehicles"]):
             route_data = {}
@@ -129,13 +130,17 @@ class Route:  # pragma: no cover
                 route_distance += routing.GetArcCostForVehicle(
                     previous_index, index, vehicle_id
                 )
-                route_data["route"] = route_id
+                route_data["vehicle"] = route_id
                 route_data["load"] = route_load
                 route_data["distance"] = route_distance
                 path.append(manager.IndexToNode(index))
 
             path_cordinates = [locations[i] for i in path]
-            route_data["path"] = path_cordinates
+            encoded_polyline = polyline.encode(path_cordinates, 5)
+            route_data["route"] = path_cordinates
+            route_data["encoded_polyline"] = encoded_polyline
+
+            
 
             plan_output += "Distance of the route: {}miles".format(route_distance)
 
@@ -144,26 +149,23 @@ class Route:  # pragma: no cover
             routes.append(plan_output)
             operations.append(route_data)
             for route_data in operations:
-                #Cleans the data to remove the roy=ute data if the distance==0
-                if route_data["distance"]==0:
-                    operations.remove(route_data) 
-                
-           
+                # Cleans the data to remove the roy=ute data if the distance==0
+                if route_data["distance"] == 0:
+                    operations.remove(route_data)
 
             total_distance += route_distance
             total_load += route_load
-            
-            payload ={"total_distance":total_distance,"operations":operations}
-                
-            
+
+            payload = {
+                "total_distance": total_distance,
+                "total_load": total_load,
+                "no_vehicles_used": len(operations),
+                "solution": operations,
+            }
 
         return (
+            payload,
             routes,
-            
-            total_load,
-            payload
-            
-            
         )
 
     def generate_routes(self):
