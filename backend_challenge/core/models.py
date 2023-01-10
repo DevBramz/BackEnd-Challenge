@@ -136,7 +136,7 @@ class Order(TimeStampedModel):
         if not self.code:
             self.code = generate_secret()
         if not self.created:
-            timecreated = self.added.strftime("%Y-%m-%d-%H:%M")
+            timecreated = self.added
             self.created = timecreated
 
         super().save(**kwargs)

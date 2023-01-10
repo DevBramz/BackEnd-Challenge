@@ -16,7 +16,7 @@ from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 
 
-class Route:
+class Route:  # pragma: no cover
     # gmaps = googlemaps.Client(key="WWWWW")
 
     # This computes the distance matrix by using GOOGLE MATRIX API
@@ -152,12 +152,17 @@ class Route:
 
             total_distance += route_distance
             total_load += route_load
+            
+            payload ={"total_distance":total_distance,"operations":operations}
+                
+            
 
         return (
             routes,
-            operations,
+            
             total_load,
-            total_distance,
+            payload
+            
             
         )
 

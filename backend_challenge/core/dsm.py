@@ -246,7 +246,7 @@ class Router:
         else:
             return "ERROR"
         
-        
+    # https://stackoverflow.com/questions/45733763/pytest-run-tests-parallel   
           # class OrderShipmentSerializer(serializers.HyperlinkedModelSerializer):
     #     class Meta:
     #         model = OrderShipment

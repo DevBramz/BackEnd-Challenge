@@ -42,6 +42,7 @@ def send_sms(order_id):
     return response
 #    sudo service redis-server stop
 # $ celery -Abackend_challenge worker -l INFO
+# coverage run --omit 'venv/*' -m pytest && coverage report -m
 
 
 
