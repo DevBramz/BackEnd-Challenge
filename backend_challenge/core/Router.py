@@ -59,9 +59,16 @@ class CVRP:  # pragma: no cover
         return distance_matrix
 
     def all_waypoints(self):
-        """returns a list of waypoints including the start adress a in optimization settings"""
+        """
+        returns a list of waypoints including the start adress a in optimization settings
+        To be used in calcuation of distance matrix   
+        """
+        # all = [self.start_adress] + [
+        #     delivery.location for delivery in self.deliveries
+        # ]
+        # print(all)
         waypoints = [self.start_adress] + [
-            delivery.location for delivery in self.deliveries
+            delivery.location["latlong"] for delivery in self.deliveries
         ]
         return waypoints
 
