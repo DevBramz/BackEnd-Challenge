@@ -234,7 +234,8 @@ class DeliveryViewSet(viewsets.ModelViewSet):
 
 class RouteViewSet(viewsets.ModelViewSet):
     """
-    A simple ViewSet for viewing and editing accounts.
+    A simple ViewSet for creating route settings and generating
+    routes 
     """
 
     queryset = RouteSettings.objects.all()

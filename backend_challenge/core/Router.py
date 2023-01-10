@@ -8,8 +8,7 @@ from ortools.constraint_solver import pywrapcp
 import googlemaps
 import numpy as np
 from geopy.distance import great_circle, geodesic
-from rest_framework import status
-from rest_framework.response import Response
+
 
 """Capacited Vehicles Routing Problem (CVRP)."""
 
@@ -43,7 +42,7 @@ class Route:
         self.capacity = capacity
 
     def compute_distance_matrix(self, overall_locations):
-        # This computes the distance matrix by using GOOGLE MATRIX API
+        """ This computes the distance matrix by using GOOGLE MATRIX API """
         response = self.gmaps.distance_matrix(
             overall_locations[0:], overall_locations[0:], mode="driving"
         )
@@ -57,15 +56,15 @@ class Route:
         return distance_matrix
 
     def all_waypoints(self):
-        # returns a list of waypoints inclufing the start adress and end adress in optimization settings
+        """returns a list of waypoints including the start adress a in optimization settings"""
         waypoints = [self.start_adress] + [
             delivery.location for delivery in self.deliveries
         ]
         return waypoints
 
     def compute_geodisic_distance_matrix(self):
-        # This computes the distance matrix by using geopy
-
+        """computes the distance matrix by using geopy"""
+      
         waypoints = self.all_waypoints()
         distance_matrix = [
             [(int(geodesic(p1, p2).miles)) for p2 in waypoints] for p1 in waypoints
@@ -93,23 +92,22 @@ class Route:
         ]
 
         data["num_vehicles"] = self.num_vehicles
-        data["vehicle_capacities"] = [self.capacity]* self.num_vehicles
-        print(data["vehicle_capacities"])
+        data["vehicle_capacities"] = [self.capacity] * self.num_vehicles
 
         data["depot"] = 0
         return data
 
     def routing_solution(self, data, manager, routing, solution):
-        """returns rouing soluting """
-    
+        """returns rouing soluting"""
+
         total_distance = 0
         total_load = 0
         routes = []
 
-        operationsi = []
+        operations= []
         path_cordinates = []
         for vehicle_id in range(data["num_vehicles"]):
-            operations = {}
+            route_data = {}
 
             index = routing.Start(vehicle_id)
             plan_output = "Route {} for vehicle:".format(vehicle_id)
@@ -131,29 +129,36 @@ class Route:
                 route_distance += routing.GetArcCostForVehicle(
                     previous_index, index, vehicle_id
                 )
-                operations["route_id"] = route_id
-                operations["load"] = route_load
-                operations["dis"] = route_distance
+                route_data["route"] = route_id
+                route_data["load"] = route_load
+                route_data["distance"] = route_distance
                 path.append(manager.IndexToNode(index))
 
             path_cordinates = [locations[i] for i in path]
-            operations["route"] = path_cordinates
+            route_data["path"] = path_cordinates
 
             plan_output += "Distance of the route: {}miles".format(route_distance)
 
             plan_output += "Load of the route: {}\n".format(route_load)
 
             routes.append(plan_output)
-            operationsi.append(operations)
+            operations.append(route_data)
+            for route_data in operations:
+                #Cleans the data to remove the roy=ute data if the distance==0
+                if route_data["distance"]==0:
+                    operations.remove(route_data) 
+                
+           
 
             total_distance += route_distance
             total_load += route_load
 
         return (
             routes,
-            operationsi,
+            operations,
             total_load,
             total_distance,
+            
         )
 
     def generate_routes(self):
@@ -226,4 +231,5 @@ class Route:
         if solution:
             return self.routing_solution(data, manager, routing, solution)
         else:
-            return Response({"error": "msgs"}, status=status.HTTP_400_BAD_REQUEST)
+            msg = "Could not generate route path"
+            return {"msg": msg}

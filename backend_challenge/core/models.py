@@ -154,9 +154,9 @@ class RouteSettings(TimeStampedModel):
         Manual = "MU", _("Manual")
 
     class Mode(models.TextChoices):
-        Distance = "D", _("Min Distance")
-        Arrival = "A", _("Arrival Time")
-        Balance = "B", _("Balance Distance and Arrival Time")
+        Distance = "Minimum Distance", _("Min Distance")
+        Arrival = "Ensure Arrival Time", _("Arrival Time")
+        Balance = "Balance Distance and Arrival Times ", _("Balance Distance and Arrival Time")
 
     vehicle_utilization = models.CharField(
         max_length=2,
@@ -164,9 +164,15 @@ class RouteSettings(TimeStampedModel):
         default=Utilization.Automatic,
     )
     mode = models.CharField(
-        max_length=2,
+        max_length=255,
         choices=Mode.choices,
         default=Mode.Distance,
+    )
+    vehicle_capacity = models.PositiveIntegerField(
+        default=2,
+    )
+    num_vehicles = models.PositiveIntegerField(
+        default=6,
     )
     start_address = models.PointField(default=Point(36.798107, -1.283922))
     end_address = models.PointField(default=Point(36.798107, -1.283922))
