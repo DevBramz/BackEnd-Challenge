@@ -10,7 +10,7 @@ import numpy as np
 from geopy.distance import great_circle, geodesic
 import polyline
 
-from backend_challenge.core.exceptions import SmsException,RoutingException
+from backend_challenge.core.exceptions import SmsException, RoutingException
 
 
 """Capacited Vehicles Routing Problem (CVRP)."""
@@ -61,21 +61,22 @@ class CVRP:  # pragma: no cover
     def all_waypoints(self):
         """
         returns a list of waypoints including the start adress a in optimization settings
-        To be used in calcuation of distance matrix   
+        To be used in calcuation of distance matrix
         """
         # all = [self.start_adress] + [
         #     delivery.location for delivery in self.deliveries
         # ]
         # print(all)
-        waypoints = [self.start_adress] + [
-            delivery.location["latlong"] for delivery in self.deliveries
+        teamhub_dict_adress = {"adress_name": "Kilimani", "latlong": self.start_adress}
+        waypoints = [teamhub_dict_adress] + [
+            delivery.location for delivery in self.deliveries
         ]
         return waypoints
 
     def compute_geodisic_distance_matrix(self):
         """computes the distance matrix by using geopy"""
 
-        waypoints = self.all_waypoints()
+        waypoints = [waypoint["latlong"] for waypoint in self.all_waypoints()]
         distance_matrix = [
             [(int(geodesic(p1, p2).miles)) for p2 in waypoints] for p1 in waypoints
         ]
@@ -143,10 +144,10 @@ class CVRP:  # pragma: no cover
                 route_data["load"] = route_load
                 route_data["distance"] = route_distance
                 path.append(manager.IndexToNode(index))
-
-            path_cordinates = [locations[i] for i in path]
+            path_adresses=[locations[i]["adress_name"] for i in path]
+            path_cordinates = [locations[i]["latlong"] for i in path]
             encoded_polyline = polyline.encode(path_cordinates, 5)
-            route_data["route"] = path_cordinates
+            route_data["route"] = path_adresses
             route_data["encoded_polyline"] = encoded_polyline
 
             plan_output += "Distance of the route: {}miles".format(route_distance)
@@ -243,8 +244,7 @@ class CVRP:  # pragma: no cover
         # Print solution on console.
         if solution:
             return self.routing_solution(data, manager, routing, solution)
-            
+
         else:
-            #hould return routing failed and log the error(logger.info(routing.status()))
+            # hould return routing failed and log the error(logger.info(routing.status()))
             raise RoutingException
-        

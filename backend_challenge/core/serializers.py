@@ -18,7 +18,8 @@ class RouteSettingsSerializer(serializers.ModelSerializer):
     def get_route_path(self, obj):
         """returns route route path"""
         deliveries = Delivery.objects.filter(status="pending")
-        start = [-1.2841, 36.8155]
+        start= [-1.2841, 36.8155]
+        
         capacity = obj.vehicle_capacity
         # num_drivers=Driver.objects.filter(available=True)
         num_vehicles = obj.num_vehicles
