@@ -139,7 +139,7 @@ class CVRP:  # pragma: no cover
                 )
                 route_data["vehicle"] = route_id
                 driver_names = list(self.drivers.values_list("name", flat=True))
-                route_data["driver_name"] = driver_names[route_id]
+                route_data["driver_name"] = driver_names[vehicle_id]
                 route_data["load"] = route_load
                 route_data["distance"] = route_distance
 
@@ -238,7 +238,7 @@ class CVRP:  # pragma: no cover
         search_parameters.local_search_metaheuristic = (
             routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
         )
-        search_parameters.time_limit.FromSeconds(5)
+        search_parameters.time_limit.FromSeconds(1)
 
         # Solve the problem.
         solution = routing.SolveWithParameters(search_parameters)

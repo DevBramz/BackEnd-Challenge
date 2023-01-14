@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from .exceptions import SmsException
 from rest_framework.exceptions import APIException, NotFound, ValidationError
 import africastalking
-from .models import Order
+# from .models import Order
 
 
 
@@ -31,11 +31,12 @@ def send_sms(order_id):
     if not sms:
         raise SmsException("Error Sending Sms")
     
-    queryset = Order.objects.select_related("customer").all()
-    order = get_object_or_404(queryset, id=order_id)
+    # queryset = Order.objects.select_related("customer").all()
+    # order = get_object_or_404(queryset, id=order_id)
     
-    message = f"Dear {order.customer} You have successfully placed an order.Your order ID is {order.id}."
-    response = sms.send(message, [order.customer.phone])
+    # message = f"Dear {order.customer} You have successfully placed an order.Your order ID is {order.id}."
+    # response = sms.send(message, [order.customer.phone])
+    response=sms.send()
     if not response:
          raise SmsException("Error Sending Sms")
         

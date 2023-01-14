@@ -1,17 +1,18 @@
 from django.contrib import admin
 from django.contrib.gis.admin import OSMGeoAdmin
 
-from .models import Customer, Order,Delivery,Driver
+from .models import Delivery,Driver,RouteSettings
 
-admin.site.register(Customer)
+
 admin.site.register(Driver)
+admin.site.register(RouteSettings)
 
-@admin.register(Order)
-class OrderAdmin(OSMGeoAdmin):
-    list_display = ('code',)
+
+
+
 @admin.register(Delivery)
 class DeliveryAdmin(OSMGeoAdmin):
-    list_display = ('code', 'delivery_adress','address','location')
+    list_display = ('code','delivery_adress','address')
 
 
 

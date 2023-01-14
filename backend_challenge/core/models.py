@@ -27,37 +27,7 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
-class Customer(TimeStampedModel):
-    phone = models.CharField(
-        max_length=13,
-        validators=[
-            RegexValidator(
-                regex=r"^\+254|07\d{9}$",
-                message="Phone number must be entered in the format '+254234567892'. Up to 12 digits allowed with no",
-            ),
-        ],
-    )
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-    )
-    code = models.CharField("code", max_length=15)
-
-    def __str__(self):
-        return str(self.user.email)
-
-
 class Driver(TimeStampedModel):
-    # STATUS_ = "Available"
-    # STATUS_Unavailable = "Unavailable"
-    # STATUS_Assigned = "Assigned"
-    # STATUS_CHOICE = (
-    #     (STATUS_Available, _("Available")),
-    #     (STATUS_Unavailable, _("Unavailable")),
-    #     (STATUS_PAID, _("paid")),
-    #     (STATUS_EXPIRED, _("expired")),
-    #     (STATUS_CANCELED, _("cancelled")),
-    # )
     phone = models.CharField(
         max_length=13,
         validators=[
@@ -67,11 +37,6 @@ class Driver(TimeStampedModel):
             ),
         ],
     )
-    # user = models.OneToOneField(
-    #     User,
-    #     on_delete=models.CASCADE,
-    # )
-    # code = models.CharField("code", max_length=15)
     national_id = models.PositiveIntegerField(db_index=True, unique=True)
     name = models.CharField("name", max_length=20)
     capacity = models.PositiveIntegerField(null=True)
@@ -94,78 +59,6 @@ class Vehicle(TimeStampedModel):
     def __str__(self):
         return str(self.no_plate)
 
-
-class Order(TimeStampedModel):
-    STATUS_DRAFT = "draft"
-    STATUS_PENDING = "pending"
-    STATUS_PAID = "paid"
-    STATUS_EXPIRED = "expired"
-    STATUS_CANCELED = "cancelled"
-    STATUS_CHOICE = (
-        (STATUS_DRAFT, _("draft")),
-        (STATUS_PENDING, _("pending")),
-        (STATUS_PAID, _("paid")),
-        (STATUS_EXPIRED, _("expired")),
-        (STATUS_CANCELED, _("cancelled")),
-    )
-    Funiture = "furniture"
-    Electronics = "electronics"
-    Fashion = "fashion"
-    CATEGORY = [
-        (Funiture, _("Furniture")),
-        (Electronics, _("electronics")),
-        (Fashion, _("fashion")),
-    ]
-    item = models.CharField("item", max_length=200)
-    category = models.CharField(
-        max_length=16, choices=CATEGORY, verbose_name=_("Category"), default="fashion"
-    )
-    amount = models.PositiveIntegerField()
-    customer = models.ForeignKey(
-        "Customer", related_name="orders", on_delete=models.CASCADE
-    )
-
-    code = models.CharField(
-        max_length=16,
-        verbose_name=_("Order code"),
-        db_index=True,
-        null=True,
-        editable=False,
-    )
-    created = models.CharField(max_length=100, null=True)
-    delivery_point = models.PointField()
-    address = models.CharField(max_length=100, blank=True, null=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICE, default="draft")
-    # scheduled_at= models.DateTimeField()
-
-    @staticmethod
-    def normalize_code(code):
-        tr = str.maketrans(
-            {
-                "2": "Z",
-                "4": "A",
-                "5": "S",
-                "6": "G",
-            }
-        )
-        return code.upper().translate(tr)
-
-    def save(self, **kwargs):
-        if "update_fields" in kwargs and "last_modified" not in kwargs["update_fields"]:
-            kwargs["update_fields"] = list(kwargs["update_fields"]) + ["last_modified"]
-        if not self.code:
-            self.code = generate_secret()
-        if not self.created:
-            timecreated = self.added
-            self.created = timecreated
-
-        super().save(**kwargs)
-
-    def __str__(self):
-        return str(self.id)
-
-    class Meta:
-        ordering = ["-added"]
 
 
 class RouteSettings(TimeStampedModel):
