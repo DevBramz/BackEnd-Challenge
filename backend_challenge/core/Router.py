@@ -13,12 +13,6 @@ import polyline
 from backend_challenge.core.exceptions import SmsException, RoutingException
 
 
-"""Capacited Vehicles Routing Problem (CVRP)."""
-
-from ortools.constraint_solver import routing_enums_pb2
-from ortools.constraint_solver import pywrapcp
-
-
 class CVRP:  # pragma: no cover
     # gmaps = googlemaps.Client(key="WWWWW")
 
@@ -32,17 +26,16 @@ class CVRP:  # pragma: no cover
     least cost, while never exceeding the capacity of the vehicles.
     """
 
-    num_vehicles = 0
-    deliveries = None
+    drivers = []
+    deliveries = []
     start_adress = None
     end_adress = None
     capacity = 0
 
-    def __init__(self, num, deliveries, start, capacity):
-        self.num_vehicles = num
+    def __init__(self, drivers, deliveries, start):
+        self.drivers = drivers
         self.deliveries = deliveries
         self.start_adress = start
-        self.capacity = capacity
 
     def compute_distance_matrix(self, overall_locations):
         """This computes the distance matrix by using GOOGLE MATRIX API"""
@@ -63,11 +56,11 @@ class CVRP:  # pragma: no cover
         returns a list of waypoints including the start adress a in optimization settings
         To be used in calcuation of distance matrix
         """
-        # all = [self.start_adress] + [
-        #     delivery.location for delivery in self.deliveries
-        # ]
-        # print(all)
-        teamhub_dict_adress = {"adress_name": "Kilimani", "latlong": self.start_adress}
+        teamhub_dict_adress = {
+            "adress_name": "Kilimani",
+            "latlong": self.start_adress,
+        }  # fetch adress from team hub
+
         waypoints = [teamhub_dict_adress] + [
             delivery.location for delivery in self.deliveries
         ]
@@ -90,20 +83,24 @@ class CVRP:  # pragma: no cover
 
         data["demands"] = [
             0,  # the quantity of the delivery in each delivery adress
-            1,
+            3,  # use deelivery.quantity for deliveries
+            7,
+            4,
+            9,
+            4,
             8,
             4,
-            4,
-            4,
-            4,
-            8,
             2,
-            8,
-            3,
+            4,
+            7,
         ]
 
-        data["num_vehicles"] = self.num_vehicles
-        data["vehicle_capacities"] = [self.capacity] * self.num_vehicles
+        data[
+            "num_vehicles"
+        ] = self.drivers.count()  # for better and faster queries than usinglen()
+        data["vehicle_capacities"] = list(
+            self.drivers.values_list("capacity", flat=True)
+        )  # flat=True return list   from queryset object more perfornamnt
 
         data["depot"] = 0
         return data
@@ -121,7 +118,7 @@ class CVRP:  # pragma: no cover
             route_data = {}
 
             index = routing.Start(vehicle_id)
-            plan_output = "Route {} for vehicle:".format(vehicle_id)
+            plan_output = "Route {} for :".format(vehicle_id)
             route_distance = 0
             route_load = 0
             route_id = vehicle_id + 1
@@ -141,10 +138,15 @@ class CVRP:  # pragma: no cover
                     previous_index, index, vehicle_id
                 )
                 route_data["vehicle"] = route_id
+                driver_names = list(self.drivers.values_list("name", flat=True))
+                route_data["driver_name"] = driver_names[route_id]
                 route_data["load"] = route_load
                 route_data["distance"] = route_distance
+
+                # route_data["vehicle_capacity_utilization"] =
+
                 path.append(manager.IndexToNode(index))
-            path_adresses=[locations[i]["adress_name"] for i in path]
+            path_adresses = [locations[i]["adress_name"] for i in path]
             path_cordinates = [locations[i]["latlong"] for i in path]
             encoded_polyline = polyline.encode(path_cordinates, 5)
             route_data["route"] = path_adresses
@@ -157,7 +159,7 @@ class CVRP:  # pragma: no cover
             routes.append(plan_output)
             operations.append(route_data)
             for route_data in operations:
-                # Cleans the data to remove the roy=ute data if the distance==0
+                # Cleans the data to remove the route data if the distance==0
                 if route_data["distance"] == 0:
                     operations.remove(route_data)
 
@@ -166,7 +168,7 @@ class CVRP:  # pragma: no cover
             payload = {
                 "total_distance": total_distance,
                 "total_load": total_load,
-                "no_vehicles_used": len(operations),
+                "num_vehicles_used": len(operations),
                 "solution": operations,
             }
 
@@ -236,7 +238,7 @@ class CVRP:  # pragma: no cover
         search_parameters.local_search_metaheuristic = (
             routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
         )
-        search_parameters.time_limit.FromSeconds(10)
+        search_parameters.time_limit.FromSeconds(5)
 
         # Solve the problem.
         solution = routing.SolveWithParameters(search_parameters)

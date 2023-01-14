@@ -32,8 +32,8 @@ Customers gets message after order created sucessfully(Asynchronous  Task) <br /
 | /api/v1/delivery/ |Get all deliveries  | GET  |
   api/v1/delivery/  | create customer  | POST |
 | /api/v1/delivery/1  |Detail Delivery  | GET  |
-  /api/v1/route/Create| Create Rout || POST  |
- /api/v1/route/| Create Route | POST  |
+  /api/v1/route/Create| Create Route || POST  |
+ /api/v1/route/1| Create Route | POST  |
 /api/v1/route/1 | Route Detail | GET |
 https://developers.google.com/maps/documentation/javascript/examples/polyline-simple
 
@@ -43,6 +43,28 @@ api/v1/delivery/export_deliveries
 api/v1/delivery/
 api/v1/delivery/
 api/v1/delivery/
+
+Endpoints:
+----------
+
+### Get all Deliveries
+
+`GET api/v1/delivery`
+
+Example request body:
+
+```source-json
+{
+  "user":{
+    "email": "jake@jake.jake",
+    "password": "jakejake"
+  }
+}
+```
+
+No authentication required, returns a User
+
+Required fields: `email`, `password`
 
 ```source-json
 [

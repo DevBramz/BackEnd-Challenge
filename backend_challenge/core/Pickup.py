@@ -245,7 +245,7 @@ class Router:
             return self.construct_response(data, manager, routing, solution)
         else:
             return "ERROR"
-    
+    # https://www.acsce.edu.in/acsce/wp-content/uploads/2020/03/1585041316993_Module-4.pdf
     
     # https://stackoverflow.com/questions/59527019/using-capacity-constraint-with-pickup-and-delivery
     # https://groups.google.com/g/or-tools-discuss/c/-smvHltBSvs
@@ -420,7 +420,7 @@ class Router:
 # CREATE DATABASE geodjango WITH OWNER
 # https://www.alibabacloud.com/blog/setting-up-a-postgresql-database-on-an-ubuntu-instance_594124;
 # https://www.alibabacloud.com/blog/setting-up-a-postgresql-database-on-an-ubuntu-instance_594124;
-# maximum no of deliveries;proof of delivery, Delivery_window,no of vehicldes
+
 # No entrance windows, bad weather, high traffic hours, and unexpected route obstructions can all significantly slow down your delivery. As a result, it’s critical to use dynamic delivery route optimization software that calculates and assigns the most effective delivery routes.
 # https://sandesh-deshmane.medium.com/architecture-and-design-principles-for-online-food-delivery-system-33bfda73785d
 # https://stackoverflow.com/questions/13122020/google-map-api-drawn-polyline-with-encoded-points
@@ -429,6 +429,79 @@ class Router:
 # https://googlemaps.github.io/js-polyline-codec/index.html
 # https://googlemaps.github.io/js-polyline-codec/index.html
 #  total demand is greater than the total vehicle capacity. 
+# https://editor.datatables.net/examples/datatables/mJoin.html
+# https://datatables.net/reference/option/ajax.data#Examples
+# https://datatables.net/examples/index
+# https://datatables.net/examples/api/select_row.html
+
+# https://datatables.net/forums/discussion/72253/get-data-from-selected-row
+# # update status of all deliveries in one operation
+        # Delivery.objects.bulk_update(delivery_bulk_update_list, ['status'])
+        # https://stackoverflow.com/questions/42570465/datatables-select-all-checkbox
+        # https://www.freecodecamp.org/news/how-to-work-with-multiple-checkboxes-in-react/
+        # https://github.com/fiduswriter/Simple-DataTables
+    # @action(detail=False)
+
+
+
+    # def bulk_assign(self, request, *args, **kwargs):
+
+    #     """
+    #    Doing this will ensure that all the update operations performed
+    #    in the loop will be executed in the database as a single transaction
+    #    as opposed to performing each of these operations separately. To be clear, each update operation still runs as a separate
+    #    query in the database, but it will be faster because the time needed to commit the transaction is amortized over all
+    #    the enclosed update statements.
+
+    #     """'/'
+    #     data=Delivery.objects.all()
+
+    #     drivers=Driver.objects.filter(availability_status=True).exists()
+    #     if drivers:
+    #     book_mapping = {book.id: book for book in data}
+    #     data_mapping = {item['id']: item for item in validated_data}
+
+    #     # Perform creations and updates.
+    #     ret = []
+    #     for book_id, data in data_mapping.items():
+    #         book = book_mapping.get(book_id, None)
+    #         if book is None:
+    #             ret.append(self.child.create(data))
+    #         else:
+    #             ret.append(self.child.update(book, data))
+
+    #     # Perform deletions.
+    #     for book_id, book in book_mapping.items():
+    #         if book_id not in data_mapping:
+    #             book.delete()
+
+    #     return ret
+
+    #     # if drivers:
+    #         # not_found = {
+    #         # #     "errors": "This article has not been found."
+    #         # # }
+    #         # return Response(data=not_found, status=status.HTTP_404_NOT_FOUND)
+    #     select_delivery_ids = {
+
+    #     # this dict can contain n key value pairs.
+    #     }
+
+    #     # create a list of delivery objects that need to be updated in bulk update
+    #     delivery_bulk_update_list = []
+
+    #     for key, value in delivery_ids_dict:
+    #     delivery = Delivery.objects.get(id=key)
+    #     driver=drivers.first()
+    #     delivery.assign(driver)
+
+    #     # append the updated delivery object to the list
+    #     delivery_bulk_update_list.append(delivery)
+
+    #     # update scores of all deliveries in one operation
+    #     Delivery.objects.bulk_update(user_bulk_update_list, ['status'])
+    #     queryset = self.filter_queryset(self.get_queryset())
+
 
 
 
@@ -439,7 +512,11 @@ class Router:
 # Balance time and distance
 # Balance time and distance
 # You have 20 trucks (more than enough to hold all the items) and you want to use the fewest trucks that will hold them all.
-# Automatic dispatch and asignment#automatic dispatch assumes all drivers are available
+# Automatic dispatch and asignment#automatic dispatch assumes all drivers are available,manual reodering
+# maximum no of deliveries;proof of delivery, Delivery_window,no of vehicldes,dribrt with same capacity,, no time window for delivery
+
+
+
 
 
 # Keep deliveries as i
@@ -449,4 +526,24 @@ class Router:
 # Routes API is the next generation, performance optimized version of the existing Directions API and Distance Matrix API. It helps you find the ideal route from A to Z, calculates ETAs and distances for matrices of origin and destination locations, and also offers new features.
 #     if mode not in ["driving", "walking", "bicycling", "transit"]:
 #             raise ValueError("Invalid travel mode."
+# https://www.robinwieruch.de/react-server-side-table/
+# https://www.robinwieruch.de/react-table-select/
+ # https://www.reddit.com/r/django/comments/mjpbij/running_a_bulk_update_efficiently_with_django/
+                # delivery_bulk_update_list.append(delivery)
+        # https://stackoverflow.com/questions/66434403/how-to-get-multiple-checkbox-values-in-react-js
+        # https://oxvsys.com/blogs/bulk-update-with-django-rest-framework
+        # https://github.com/praekelt/django-export/blob/develop/export/utils.py
+        # https://stackoverflow.com/questions/69957206/django-batch-actions-in-a-listview-select-rows-and-return-a-zip-archive-in-r
+             
+    #    objs = [
+        # Entry.objects.create(headline='Entry 1'),
+        # Entry.objects.create(headline='Entry 2'),
+        # objs[0].headline = 'This is entry 1'
+        # objs[1].headline = 'This is entry 2'
+        # Entry.objects.bulk_update(objs, ['headline'])
+        
+# https://stackoverflow.com/questions/24796209/select-multiple-rows-from-html-table-and-send-values-to-a-function-in-javascript
+# https://github.com/testdrivenio/django-ajax-xhr/blob/main/todos/views.py#L31-L53
+# https://studygyaan.com/django/how-to-integrate-ajax-with-django-applications
+# https://datatables.net/reference/api/row().data()
 

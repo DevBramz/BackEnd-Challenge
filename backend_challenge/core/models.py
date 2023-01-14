@@ -48,6 +48,16 @@ class Customer(TimeStampedModel):
 
 
 class Driver(TimeStampedModel):
+    # STATUS_ = "Available"
+    # STATUS_Unavailable = "Unavailable"
+    # STATUS_Assigned = "Assigned"
+    # STATUS_CHOICE = (
+    #     (STATUS_Available, _("Available")),
+    #     (STATUS_Unavailable, _("Unavailable")),
+    #     (STATUS_PAID, _("paid")),
+    #     (STATUS_EXPIRED, _("expired")),
+    #     (STATUS_CANCELED, _("cancelled")),
+    # )
     phone = models.CharField(
         max_length=13,
         validators=[
@@ -57,17 +67,32 @@ class Driver(TimeStampedModel):
             ),
         ],
     )
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-    )
-    code = models.CharField("code", max_length=15)
+    # user = models.OneToOneField(
+    #     User,
+    #     on_delete=models.CASCADE,
+    # )
+    # code = models.CharField("code", max_length=15)
     national_id = models.PositiveIntegerField(db_index=True, unique=True)
     name = models.CharField("name", max_length=20)
     capacity = models.PositiveIntegerField(null=True)
+    availability_status = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
+
+
+class Vehicle(TimeStampedModel):
+    state = models.BooleanField(default=True)
+
+    no_plate = models.CharField(max_length=15, verbose_name="No Plate", unique=True)
+
+    allocated_to = models.ForeignKey(
+        "Driver", related_name="drivers", on_delete=models.CASCADE
+    )
+    capacity = models.PositiveIntegerField()
+
+    def __str__(self):
+        return str(self.no_plate)
 
 
 class Order(TimeStampedModel):
@@ -155,7 +180,7 @@ class RouteSettings(TimeStampedModel):
             "Balance Distance and Arrival Time"
         )
 
-    vehicle_utilization = models.CharField(
+    vehicle_selection = models.CharField(
         max_length=2,
         choices=Utilization.choices,
         default=Utilization.Automatic,
@@ -165,12 +190,9 @@ class RouteSettings(TimeStampedModel):
         choices=Mode.choices,
         default=Mode.Distance,
     )
-    vehicle_capacity = models.PositiveIntegerField(
-        default=2,
-    )
-    num_vehicles = models.PositiveIntegerField(
-        default=6,
-    )
+    # num_vehicles = models.PositiveIntegerField(
+    #     default=6,
+    # )
     start_address = models.PointField(default=Point(36.798107, -1.283922))
     end_address = models.PointField(default=Point(36.798107, -1.283922))
 
@@ -181,11 +203,13 @@ class RouteSettings(TimeStampedModel):
 class Delivery(TimeStampedModel):
     STATUS_DRAFT = "draft"
     STATUS_PENDING = "pending"
+    STATUS_ASSIGNED = "assigned"
     STATUS_DElIVERED = "delivered"
     STATUS_CHOICE = (
         (STATUS_DRAFT, _("draft")),
         (STATUS_PENDING, _("pending")),
         (STATUS_DElIVERED, _("delivered")),
+        (STATUS_ASSIGNED, _("assigned")),
     )
     code = models.CharField(max_length=100, blank=True)
     delivery_adress = models.PointField()
@@ -208,11 +232,21 @@ class Delivery(TimeStampedModel):
 
     def save(self, **kwargs):
         if "update_fields" in kwargs and "last_modified" not in kwargs["update_fields"]:
-            kwargs["update_fields"] = list(kwargs["update_fields"]) + ["last_modified"]
+            kwargs["update_fields"] = list(kwargs["update_fields"]) + ["edited"]
         if not self.code:
             self.code = generate_secret()
 
         super().save(**kwargs)
+
+    #         # we omit storing the driver on the model for simplicity of the example
+    #         self._transition(STATE_WAITING)
+
+    def assign(self, driver):
+        #         # we omit storing the driver on the model for simplicity of the example
+        #         self._transition(STATE_WAITING)
+
+        self.status = "assigned"
+        self.save(update_fields=["status"])
 
     def __str__(self):
         return str(self.code)
