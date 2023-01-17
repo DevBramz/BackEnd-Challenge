@@ -11,11 +11,11 @@ class UserIsNotAuthenticated(APIException):
     default_detail = "You should be logged in to proceed."
 
 
-class RouterException(Exception):
-    message = ""
+# class RouterException(Exception):
+#     message = ""
 
-    def __init__(self, msg) -> None:
-        self.message = msg
+#     def __init__(self, msg) -> None:
+#         self.message = msg
 
 
 class BinpackingException(Exception):
@@ -47,5 +47,5 @@ class SmsException(Exception):
 
 class RoutingException(APIException):
     status_code = 400
-    default_detail = 'Route Optimization Failed,This could be as a result of your total quantity of deliveries exceeding the total vehicle capacity"'
+    default_detail = 'Route Optimization Failed,This could be as a result of your total weight of deliveries exceeding the total vehicle capacity"'
     default_code = "service_unavailable"

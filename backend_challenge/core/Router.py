@@ -9,6 +9,7 @@ import googlemaps
 import numpy as np
 from geopy.distance import great_circle, geodesic
 import polyline
+from .models import Trip
 
 from backend_challenge.core.exceptions import SmsException, RoutingException
 
@@ -81,19 +82,8 @@ class CVRP:  # pragma: no cover
         data = {}
         data["distance_matrix"] = self.compute_geodisic_distance_matrix()
 
-        data["demands"] = [
-            0,  # the quantity of the delivery in each delivery adress
-            3,  # use deelivery.quantity for deliveries
-            7,
-            4,
-            9,
-            4,
-            8,
-            4,
-            2,
-            4,
-            7,
-        ]
+        data["demands"] = [0] + list(self.deliveries.values_list("weight", flat=True))
+        # the quantity of the delivery in each delivery adre
 
         data[
             "num_vehicles"
@@ -138,12 +128,16 @@ class CVRP:  # pragma: no cover
                     previous_index, index, vehicle_id
                 )
                 route_data["vehicle"] = route_id
-                driver_names = list(self.drivers.values_list("name", flat=True))
-                route_data["driver_name"] = driver_names[vehicle_id]
+                driver_dict = self.drivers.values()
+                route_data["driver_name"] = driver_dict[vehicle_id]["name"]
                 route_data["load"] = route_load
                 route_data["distance"] = route_distance
+                driver_capacity = driver_dict[vehicle_id]["capacity"]
+                vehicle_utilization = (route_load / driver_capacity) * 100
+                route_data["vehicle_capacity_utilization"] = vehicle_utilization
 
-                # route_data["vehicle_capacity_utilization"] =
+                # route_data["vehicle_capacity_utilization"] =[((route_load/driver["capacity"])*100)for driver in drivers_dict]
+                # print(route_data["vehicle_capacity_utilization"])
 
                 path.append(manager.IndexToNode(index))
             path_adresses = [locations[i]["adress_name"] for i in path]
@@ -158,7 +152,7 @@ class CVRP:  # pragma: no cover
 
             routes.append(plan_output)
             operations.append(route_data)
-            for route_data in operations:
+            for route_data in operations[:]:
                 # Cleans the data to remove the route data if the distance==0
                 if route_data["distance"] == 0:
                     operations.remove(route_data)
@@ -169,7 +163,7 @@ class CVRP:  # pragma: no cover
                 "total_distance": total_distance,
                 "total_load": total_load,
                 "num_vehicles_used": len(operations),
-                "solution": operations,
+                "routes": operations,
             }
 
         return (
@@ -223,7 +217,7 @@ class CVRP:  # pragma: no cover
         routing.AddDimension(
             transit_callback_index,
             0,  # no slack
-            3000,  # vehicle maximum travel distance
+            30000000,  # vehicle maximum travel distance
             True,  # start cumul to zero
             dimension_name,
         )

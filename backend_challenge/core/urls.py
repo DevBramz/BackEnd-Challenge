@@ -9,6 +9,7 @@ from .views import (
     # ExportOrdersView,
     DeliveryViewSet,
     RouteViewSet,
+    Contact,
    
 )
 
@@ -30,7 +31,7 @@ urlpatterns = [
     path("", include(delivery_router.urls)),
     path("", include(optimize_router.urls)),
   
-    # path("export/orders", ExportOrdersView.as_view()),
+    path("contact", Contact.as_view()),
     # path("customer", views.Customer_Create.as_view(), name="customer"),
     # path("order", OrderListCreateAPIView.as_view(), name="order"),
    

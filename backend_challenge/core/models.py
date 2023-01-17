@@ -60,18 +60,15 @@ class Vehicle(TimeStampedModel):
         return str(self.no_plate)
 
 
-
 class RouteSettings(TimeStampedModel):
     class Utilization(models.TextChoices):
         Automatic = "AU", _("Automatic")
         Manual = "MU", _("Manual")
 
     class Mode(models.TextChoices):
-        Distance = "Minimum Distance", _("Min Distance")
+        Distance = "Min_Distance", _("Minimize Distance")
         Arrival = "Ensure Arrival Time", _("Arrival Time")
-        Balance = "Balance Distance and Arrival Times ", _(
-            "Balance Distance and Arrival Time"
-        )
+        minimum_vehicles = "Min_Vehicles", _("Minimum Vehicle") #Focuses more on capacity utilization,uses fewest list(self.deliveries.values_list("weight", flat=True)) vehicles which might travel longer distance
 
     vehicle_selection = models.CharField(
         max_length=2,
@@ -88,9 +85,14 @@ class RouteSettings(TimeStampedModel):
     # )
     start_address = models.PointField(default=Point(36.798107, -1.283922))
     end_address = models.PointField(default=Point(36.798107, -1.283922))
+    
+    class Meta:
+        verbose_name = _("RouteSettings")
+        verbose_name_plural = _("RouteSettings")
 
     def __str__(self):
         return str(self.id)
+ 
 
 
 class Delivery(TimeStampedModel):
@@ -112,8 +114,12 @@ class Delivery(TimeStampedModel):
         blank=True,
         null=True,
     )
-    quantity = models.PositiveIntegerField(default=1)
+    weight = models.PositiveIntegerField(default=1,verbose_name="Quantity/Weight", help_text="For Route Optimization purposes")
     status = models.CharField(max_length=20, choices=STATUS_CHOICE, default="pending")
+    
+    class Meta:
+        verbose_name = _("Delivery")
+        verbose_name_plural = _("Deliveries")
 
     @property
     def location(self):
@@ -142,4 +148,20 @@ class Delivery(TimeStampedModel):
         self.save(update_fields=["status"])
 
     def __str__(self):
-        return str(self.code)
+        return str(self.id)
+
+
+class Trip(TimeStampedModel):
+    code = models.CharField(max_length=100, blank=True)
+    driver = models.CharField(max_length=100, blank=True)
+
+    def save(self, **kwargs):
+        if "update_fields" in kwargs and "last_modified" not in kwargs["update_fields"]:
+            kwargs["update_fields"] = list(kwargs["update_fields"]) + ["edited"]
+        if not self.code:
+            self.code = generate_secret()
+
+        super().save(**kwargs)
+
+    def __str__(self):
+        return str(self.id)

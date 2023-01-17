@@ -14,10 +14,7 @@ from rest_framework.decorators import action
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.decorators import api_view, permission_classes
 from .models import Delivery, Driver, RouteSettings
-from .serializers import (
-    RouteSettingsSerializer,
-    DeliverySerializer,
-)
+from .serializers import RouteSettingsSerializer, DeliverySerializer, ContactForm
 from .tasks import send_sms
 from django.template.defaultfilters import slugify
 from rest_framework.reverse import reverse
@@ -162,3 +159,21 @@ class RouteViewSet(viewsets.ModelViewSet):
 #     content = {'not_done': user_count}
 
 #     return Response(content)
+
+
+class Contact(APIView):
+    serializer_class = ContactForm
+
+    def post(self, request, **kwargs):
+        """
+        Get the entire edit history for a comment
+        :param request:
+        :param kwargs:
+        :return:
+        """
+        data = request.data
+        
+
+        serializer = self.serializer_class(data)
+
+        return Response(serializer.data, status.HTTP_200_OK)
