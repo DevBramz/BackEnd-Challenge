@@ -3,10 +3,11 @@ import json
 from rest_framework import serializers
 from rest_framework.exceptions import APIException, NotFound, ValidationError
 
-from .models import  Driver,RouteSettings, Delivery
+from .models import Driver, RouteSettings, Delivery
 from django.core.exceptions import ObjectDoesNotExist
 from .Router import CVRP
 from .utilization import Packing
+
 
 class RouteSettingsSerializer(serializers.ModelSerializer):
     routes_data = serializers.SerializerMethodField()
@@ -14,10 +15,7 @@ class RouteSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = RouteSettings
         fields = "__all__"
-    
-    
-     
-     
+
     def get_routes_data(self, obj):
         """returns route route path"""
         deliveries = Delivery.objects.filter(
@@ -28,53 +26,54 @@ class RouteSettingsSerializer(serializers.ModelSerializer):
         #     -1.2841,
         #     36.8155,
         # ]  # using this for now but would need to use teamhub adress from form data
-      
+
         # num_drivers=Driver.objects.filter(available=True)
         start = [
             -1.2951239,
             # kilimani business center
-           36.7815907
+            36.7815907,
         ]  # using this for now but would need to use teamhub adress from form data
-        all_drivers=Driver.objects.all()
-        print(obj.mode)
-        if obj.mode=="Min_Distance":
-           drivers=all_drivers
+        all_drivers = Driver.objects.all()
+
+        if obj.selection == "Min_Distance":
+            drivers = all_drivers
         #    print(drivers)
         else:
-            # obj.mode=="Min_Vehicles"
-            Packed=Packing(deliveries,all_drivers)
-            list_of_ids=Packed.main()
-            
+            obj.selection == "Min_Veh"
+            Packed = Packing(deliveries, all_drivers)
+            list_of_ids = Packed.main()
+
             # driverlot=[all_drivers[i] for i in driver_indexes]
-            drivers=all_drivers.filter(pk__in=list_of_ids)
+            drivers = all_drivers.filter(pk__in=list_of_ids)
             print(drivers)
-        route = CVRP(drivers, deliveries, start,)  # Route Object
+        route = CVRP(
+            drivers,
+            deliveries,
+            start,
+        )  # Route Object
 
         return route.generate_routes()
 
 
 class DeliverySerializer(serializers.ModelSerializer):
     cordinates = serializers.SerializerMethodField()
-
+   
     class Meta:
         model = Delivery
-        fields = ["id", "code", "address", "cordinates", "status","weight"]
+        fields = ["id", "code", "address", "cordinates", "status", "weight",]
 
     def get_cordinates(self, obj):
         """Serializer method to return obj location in lat,long"""
         return obj.location
+
 
 class ContactForm(serializers.Serializer):
     email = serializers.EmailField()
     message = serializers.CharField()
 
     def save(self):
-        email = self.validated_data['email']
-        message = self.validated_data['message']
-       
-
-
-
+        email = self.validated_data["email"]
+        message = self.validated_data["message"]
 
 
 # class DriverListSerializer(serializers.ListSerializer):

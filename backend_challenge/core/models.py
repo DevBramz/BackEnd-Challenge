@@ -1,6 +1,7 @@
 import string
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.utils.crypto import get_random_string
@@ -62,37 +63,45 @@ class Vehicle(TimeStampedModel):
 
 class RouteSettings(TimeStampedModel):
     class Utilization(models.TextChoices):
-        Automatic = "AU", _("Automatic")
+
+        minimum_vehicles = "Min_Veh", _(
+            "Minimum Vehicle"
+        )  # Focuses more on capacity utilization,uses fewest vehicles which might travel longer distance
+
+        Distance = "Min_Distance", _(
+            "Balance Distance and Vehicle Utilization"
+        )  # Finds a balance between distance and capacities available
+
         Manual = "MU", _("Manual")
 
-    class Mode(models.TextChoices):
-        Distance = "Min_Distance", _("Minimize Distance")
-        Arrival = "Ensure Arrival Time", _("Arrival Time")
-        minimum_vehicles = "Min_Vehicles", _("Minimum Vehicle") #Focuses more on capacity utilization,uses fewest list(self.deliveries.values_list("weight", flat=True)) vehicles which might travel longer distance
+    # class Mode(models.TextChoices):
+    #     Distance = "Min_Distance", _("Minimize Distance")
+    #     Arrival = "Ensure Arrival Time", _("Arrival Time")
+    #     minimum_vehicles = "Min_Vehicles", _("Minimum Vehicle")
 
-    vehicle_selection = models.CharField(
-        max_length=2,
-        choices=Utilization.choices,
-        default=Utilization.Automatic,
-    )
-    mode = models.CharField(
+    selection = models.CharField(
         max_length=255,
-        choices=Mode.choices,
-        default=Mode.Distance,
+        choices=Utilization.choices,
+        default=Utilization.Distance,
+        verbose_name="Vehicle Selection",
     )
+    # mode = models.CharField(
+    #     max_length=255,
+    #     choices=Mode.choices,
+    #     default=Mode.Distance,
+    
     # num_vehicles = models.PositiveIntegerField(
     #     default=6,
     # )
     start_address = models.PointField(default=Point(36.798107, -1.283922))
     end_address = models.PointField(default=Point(36.798107, -1.283922))
-    
+
     class Meta:
         verbose_name = _("RouteSettings")
         verbose_name_plural = _("RouteSettings")
 
     def __str__(self):
         return str(self.id)
- 
 
 
 class Delivery(TimeStampedModel):
@@ -114,9 +123,13 @@ class Delivery(TimeStampedModel):
         blank=True,
         null=True,
     )
-    weight = models.PositiveIntegerField(default=1,verbose_name="Quantity/Weight", help_text="For Route Optimization purposes")
+    weight = models.PositiveIntegerField(
+        default=1,
+        verbose_name="Quantity/Weight",
+        help_text="For Route Optimization purposes",
+    )
     status = models.CharField(max_length=20, choices=STATUS_CHOICE, default="pending")
-    
+
     class Meta:
         verbose_name = _("Delivery")
         verbose_name_plural = _("Deliveries")
@@ -128,6 +141,11 @@ class Delivery(TimeStampedModel):
         location_list = [lat, long]
         location_info = {"adress_name": self.address, "latlong": location_list}
         return location_info
+    
+    # @property
+    # def clone(self):
+    #     """Serializer method to clone """
+    #     return reverse("core:delivery-clone", args=[self.id])
 
     def save(self, **kwargs):
         if "update_fields" in kwargs and "last_modified" not in kwargs["update_fields"]:

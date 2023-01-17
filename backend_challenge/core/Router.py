@@ -130,8 +130,9 @@ class CVRP:  # pragma: no cover
                 route_data["vehicle"] = route_id
                 driver_dict = self.drivers.values()
                 route_data["driver_name"] = driver_dict[vehicle_id]["name"]
-                route_data["load"] = route_load
                 route_data["distance"] = route_distance
+                route_data["load"] = route_load
+                
                 driver_capacity = driver_dict[vehicle_id]["capacity"]
                 vehicle_utilization = (route_load / driver_capacity) * 100
                 route_data["vehicle_capacity_utilization"] = vehicle_utilization

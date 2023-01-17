@@ -8,7 +8,7 @@ from .models import Delivery, Driver, RouteSettings, Trip
 
 @admin.register(RouteSettings)
 class RouteSettingsAdmin(OSMGeoAdmin):
-    list_display = ("mode", "start_address")
+    list_display = ("selection", "start_address")
 
 
 @admin.register(Driver)

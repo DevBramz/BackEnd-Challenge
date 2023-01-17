@@ -120,11 +120,15 @@ class DeliveryViewSet(viewsets.ModelViewSet):
 
         if delivery:
             data = {
-                "order_id": delivery.id,
-                "order_code": delivery.code,
-                "url": reverse("core:delivery-detail", args=[pk], request=request),
+                "id": delivery.id,
+                "code": delivery.code,
+                "status": delivery.status,
+                "weight": delivery.weight,
+                "address": delivery.address,
+                
+                "url": reverse("core:delivery-detail", args=[delivery.id], request=request),
             }
-            return Response(data)
+            return Response(data,status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
