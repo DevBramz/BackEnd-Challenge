@@ -2,7 +2,7 @@ from ortools.linear_solver import pywraplp
 from .exceptions import RoutingException
 
 
-class Packing:
+class LoadOptimization:
     deliveries = []
     bin_capacity = 0
     drivers = []
@@ -14,20 +14,13 @@ class Packing:
         """Create the data for the example."""
         data = {}
         drivers_dict = self.drivers.values()
-        # print(drivers_dict)
-        # weights = list(self.deliveries.values_list("weight", flat=True))
         weights = list(self.deliveries.values_list("weight", flat=True))
-        print(weights)
         data["weights"] = weights
 
         data["items"] = list(range(len(weights)))
         capacities = [driver["capacity"] for driver in drivers_dict]
         data["bins"] = list(range(len(capacities)))  # data['items']
         data["bin_capacities"] = capacities
-        # data['bins'] = data['items']
-        # data['bin_capacity'] = [100, 30,]
-        # print(data['bin_capacity'])
-
         return data
 
     def main(self):
@@ -86,13 +79,6 @@ class Packing:
                             bin_weight += data["weights"][i]
                     if bin_items:
                         num_bins += 1
-                        print("Bin number", j)
-                        # print("  Items packed:", bin_items)
-                        # print("  Total weight:", bin_weight)
-                        # print()
-            print(bins_used)
-            print("Number of bins used:", num_bins)
-            # print("Time = ", solver.WallTime(), " milliseconds")
             
             return bins_used
         else:

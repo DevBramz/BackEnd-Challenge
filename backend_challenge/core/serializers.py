@@ -6,7 +6,7 @@ from rest_framework.exceptions import APIException, NotFound, ValidationError
 from .models import Driver, RouteSettings, Delivery
 from django.core.exceptions import ObjectDoesNotExist
 from .Router import CVRP
-from .utilization import Packing
+from .utilization import LoadOptimization
 
 
 class RouteSettingsSerializer(serializers.ModelSerializer):
@@ -34,33 +34,48 @@ class RouteSettingsSerializer(serializers.ModelSerializer):
             36.7815907,
         ]  # using this for now but would need to use teamhub adress from form data
         all_drivers = Driver.objects.all()
+        print(all_drivers)
 
         if obj.selection == "Min_Distance":
             drivers = all_drivers
-        #    print(drivers)
-        else:
-            obj.selection == "Min_Veh"
-            Packed = Packing(deliveries, all_drivers)
-            list_of_ids = Packed.main()
-
-            # driverlot=[all_drivers[i] for i in driver_indexes]
-            drivers = all_drivers.filter(pk__in=list_of_ids)
-            print(drivers)
-        route = CVRP(
+    
+            route = CVRP(
             drivers,
             deliveries,
             start,
-        )  # Route Object
+        )  # Rout
+
+
+        elif obj.selection == "Min_Veh":
+            optimization = LoadOptimization(deliveries, all_drivers)
+            list_of_ids = optimization.main()
+
+            drivers = Driver.objects.filter(pk__in=list_of_ids)
+            print(list_of_ids)
+            route = CVRP(
+            drivers,
+            deliveries,
+            start,
+        )  # Rout
+
+        
 
         return route.generate_routes()
 
 
 class DeliverySerializer(serializers.ModelSerializer):
     cordinates = serializers.SerializerMethodField()
-   
+
     class Meta:
         model = Delivery
-        fields = ["id", "code", "address", "cordinates", "status", "weight",]
+        fields = [
+            "id",
+            "code",
+            "address",
+            "cordinates",
+            "status",
+            "weight",
+        ]
 
     def get_cordinates(self, obj):
         """Serializer method to return obj location in lat,long"""

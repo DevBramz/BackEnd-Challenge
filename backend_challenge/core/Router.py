@@ -11,7 +11,11 @@ from geopy.distance import great_circle, geodesic
 import polyline
 from .models import Trip
 
-from backend_challenge.core.exceptions import SmsException, RoutingException
+from backend_challenge.core.exceptions import (
+    SmsException,
+    RoutingException,
+    CVRPException,
+)
 
 
 class CVRP:  # pragma: no cover
@@ -52,28 +56,39 @@ class CVRP:  # pragma: no cover
 
         return distance_matrix
 
-    def all_waypoints(self):
+    def overall_locations(self):
         """
-        returns a list of waypoints including the start adress a in optimization settings
+        returns a list of all deliveries locations + depot adress including the start adress a in optimization settings
         To be used in calcuation of distance matrix
         """
         teamhub_dict_adress = {
-            "adress_name": "Kilimani",
+            "adress_name": "Kilimani",  # fetch adress from team hub, hardcorded for demo #integration
             "latlong": self.start_adress,
         }  # fetch adress from team hub
-
-        waypoints = [teamhub_dict_adress] + [
+        if not teamhub_dict_adress:
+            raise CVRPException("could not get teamhub adress")
+        overall_locations = [teamhub_dict_adress] + [
             delivery.location for delivery in self.deliveries
         ]
-        return waypoints
+        if not overall_locations:
+            raise CVRPException("could not get overall locations")
+        return overall_locations
 
     def compute_geodisic_distance_matrix(self):
         """computes the distance matrix by using geopy"""
 
-        waypoints = [waypoint["latlong"] for waypoint in self.all_waypoints()]
+        overall_locations = [
+            waypoint["latlong"] for waypoint in self.overall_locations()
+        ]  # list of waypints cordinates
+        if not overall_locations:
+            raise CVRPException("could not getoverall_locations latlong")
+
         distance_matrix = [
-            [(int(geodesic(p1, p2).miles)) for p2 in waypoints] for p1 in waypoints
+            [(int(geodesic(p1, p2).miles)) for p2 in overall_locations]
+            for p1 in overall_locations
         ]
+        if not distance_matrix:
+            raise CVRPException("could not calculate matriz")
         return distance_matrix
 
     def create_data_model(self):
@@ -83,7 +98,7 @@ class CVRP:  # pragma: no cover
         data["distance_matrix"] = self.compute_geodisic_distance_matrix()
 
         data["demands"] = [0] + list(self.deliveries.values_list("weight", flat=True))
-        # the quantity of the delivery in each delivery adre
+        # the quantity of the delivery in each delivery adress
 
         data[
             "num_vehicles"
@@ -114,7 +129,7 @@ class CVRP:  # pragma: no cover
             route_id = vehicle_id + 1
             path = [manager.IndexToNode(index)]
 
-            locations = self.all_waypoints()
+            locations = self.overall_locations()
 
             while not routing.IsEnd(index):
 
@@ -130,12 +145,14 @@ class CVRP:  # pragma: no cover
                 route_data["vehicle"] = route_id
                 driver_dict = self.drivers.values()
                 route_data["driver_name"] = driver_dict[vehicle_id]["name"]
+
                 route_data["distance"] = route_distance
                 route_data["load"] = route_load
-                
+                route_data["duration"] = "not calculated"
+
                 driver_capacity = driver_dict[vehicle_id]["capacity"]
                 vehicle_utilization = int((route_load / driver_capacity) * 100)
-                
+
                 route_data["vehicle_capacity_utilization"] = vehicle_utilization
 
                 # route_data["vehicle_capacity_utilization"] =[((route_load/driver["capacity"])*100)for driver in drivers_dict]
@@ -145,6 +162,7 @@ class CVRP:  # pragma: no cover
             path_adresses = [locations[i]["adress_name"] for i in path]
             path_cordinates = [locations[i]["latlong"] for i in path]
             encoded_polyline = polyline.encode(path_cordinates, 5)
+            route_data["deliveries"] = len(path_adresses) - 2
             route_data["route"] = path_adresses
             route_data["encoded_polyline"] = encoded_polyline
 
@@ -161,17 +179,16 @@ class CVRP:  # pragma: no cover
 
             total_distance += route_distance
             total_load += route_load
+
             payload = {
                 "total_distance": total_distance,
                 "total_load": total_load,
                 "num_vehicles_used": len(operations),
                 "routes": operations,
+                "summary": routes,
             }
 
-        return (
-            payload,
-            routes,
-        )
+        return (payload,)
 
     def generate_routes(self):
         """Solve the CVRP problem."""
@@ -242,7 +259,7 @@ class CVRP:  # pragma: no cover
         # Print solution on console.
         if solution:
             return self.routing_solution(data, manager, routing, solution)
+        raise RoutingException
 
-        else:
-            # hould return routing failed and log the error(logger.info(routing.status()))
-            raise RoutingException
+    
+            # should return routing failed and log the error(logger.info(routing.status()))

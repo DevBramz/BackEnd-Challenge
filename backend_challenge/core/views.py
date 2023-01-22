@@ -81,6 +81,7 @@ class DeliveryViewSet(viewsets.ModelViewSet):
     #     print(queryset)
 
     #     return self.export(queryset)
+    # https://www.quora.com/Can-a-software-engineer-use-one-company-source-code-in-another-company-If-not-why
 
     @action(detail=False)
     def bulk_assign(self, request, *args, **kwargs):
@@ -163,6 +164,7 @@ class RouteViewSet(viewsets.ModelViewSet):
 #     content = {'not_done': user_count}
 
 #     return Response(content)
+# https://github.com/lafifii/cvrp
 
 
 class Contact(APIView):
@@ -181,3 +183,6 @@ class Contact(APIView):
         serializer = self.serializer_class(data)
 
         return Response(serializer.data, status.HTTP_200_OK)
+    
+    
+    

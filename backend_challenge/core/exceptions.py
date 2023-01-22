@@ -43,6 +43,13 @@ class SmsException(Exception):
 
     def __init__(self, msg) -> None:
         self.message = msg
+class CVRPException(Exception):
+    """Exception raised SMS encounters an error"""
+
+    message = ""
+
+    def __init__(self, msg) -> None:
+        self.message = msg
 
 
 class RoutingException(APIException):

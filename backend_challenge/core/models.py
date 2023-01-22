@@ -42,6 +42,7 @@ class Driver(TimeStampedModel):
     name = models.CharField("name", max_length=20)
     capacity = models.PositiveIntegerField(null=True)
     availability_status = models.BooleanField(default=False)
+    
 
     def __str__(self):
         return self.name
@@ -63,15 +64,17 @@ class Vehicle(TimeStampedModel):
 
 class RouteSettings(TimeStampedModel):
     class Utilization(models.TextChoices):
+        
+        Distance = "Min_Distance", _(
+            "Balance Distance and Vehicle Utilization"
+        )  # Finds a balance between distance and capacities available
+
 
         minimum_vehicles = "Min_Veh", _(
             "Minimum Vehicle"
         )  # Focuses more on capacity utilization,uses fewest vehicles which might travel longer distance
 
-        Distance = "Min_Distance", _(
-            "Balance Distance and Vehicle Utilization"
-        )  # Finds a balance between distance and capacities available
-
+    
         Manual = "MU", _("Manual")
 
     # class Mode(models.TextChoices):
@@ -85,17 +88,15 @@ class RouteSettings(TimeStampedModel):
         default=Utilization.Distance,
         verbose_name="Vehicle Selection",
     )
-    # mode = models.CharField(
-    #     max_length=255,
-    #     choices=Mode.choices,
-    #     default=Mode.Distance,
+   
     
     # num_vehicles = models.PositiveIntegerField(
     #     default=6,
     # )
+    avoid_highways= models.BooleanField(null=True)
     start_address = models.PointField(default=Point(36.798107, -1.283922))
     end_address = models.PointField(default=Point(36.798107, -1.283922))
-
+   
     class Meta:
         verbose_name = _("RouteSettings")
         verbose_name_plural = _("RouteSettings")
@@ -183,3 +184,21 @@ class Trip(TimeStampedModel):
 
     def __str__(self):
         return str(self.id)
+    
+    # Routes are created which minimize the total number of miles driven by your workers.
+    # This will reduce the overall cost to complete the route,
+    # however, it allows for violations in your Complete Before and Complete After windows.
+     # however, it allows for violations in your Complete Before and Complete After windows.
+     # however, it allows for violations in your Complete Before and Complete After windows.
+     # however, it allows for violations in your Complete Before and Complete After windows.
+    #  https://stackoverflow.com/questions/36500331/putting-latitudes-and-longitudes-into-a-distance-matrix-google-map-api-in-pytho
+#     To avoid any issue with rounding, you can scale the distance matrix: multiply all entries of the matrix by a large number — say 100. This multiplies the length of any route by a factor of 100, but it doesn't change the solution. The advantage is that now when you round the matrix entries, the rounding amount (which is at most 0.5), is very small compared to the distances, so it won't affect the solution significantly.
+
+# If you scale the distance matrix, you also need to change the solution printer to divide the scaled route lengths by the scaling factor, so that it displays the unscaled distances of the routes.
+# Maximum tasks per driver.
+
+     
+    
+    
+
+
