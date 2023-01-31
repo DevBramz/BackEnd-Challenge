@@ -19,6 +19,10 @@ from backend_challenge.core.exceptions import (
 
 
 class CVRP:  # pragma: no cover
+    api_key = "AIzaSyBxI_rtVjyCashC_RtMxOuZnrRorwKc34M"
+
+    gmaps = googlemaps.Client(key=api_key)
+    print(gmaps)
     # gmaps = googlemaps.Client(key="WWWWW")
 
     # This computes the distance matrix by using GOOGLE MATRIX API
@@ -42,29 +46,17 @@ class CVRP:  # pragma: no cover
         self.deliveries = deliveries
         self.start_adress = start
 
-    def compute_distance_matrix(self, overall_locations):
-        """This computes the distance matrix by using GOOGLE MATRIX API"""
-        response = self.gmaps.distance_matrix(
-            overall_locations[0:], overall_locations[0:], mode="driving"
-        )
-        distance_matrix = np.zeros((len(overall_locations), len(overall_locations)))
-        for index in range(1, len(overall_locations)):
-            for idx in range(1, len(overall_locations)):
-                distance_matrix[index, idx] = response["rows"][index - 1]["elements"][
-                    idx - 1
-                ]["distance"]["value"]
-
-        return distance_matrix
-
     def overall_locations(self):
         """
         returns a list of all deliveries locations + depot adress including the start adress a in optimization settings
         To be used in calcuation of distance matrix
         """
         teamhub_dict_adress = {
+            "code":"depot",
             "adress_name": "Kilimani",  # fetch adress from team hub, hardcorded for demo #integration
             "latlong": self.start_adress,
         }  # fetch adress from team hub
+        
         if not teamhub_dict_adress:
             raise CVRPException("could not get teamhub adress")
         overall_locations = [teamhub_dict_adress] + [
@@ -91,11 +83,77 @@ class CVRP:  # pragma: no cover
             raise CVRPException("could not calculate matriz")
         return distance_matrix
 
+    def compute_distance_matrix(self):
+        """This computes the distance matrix by using GOOGLE MATRIX API"""
+        overall_locations = [
+            waypoint["latlong"] for waypoint in self.overall_locations()
+        ]
+        print(overall_locations)
+        # response = self.gmaps.distance_matrix(
+        #     overall_locations[0:], overall_locations[0:], mode="driving"
+        # )
+        response={
+            "destination_addresses": ["Lexington, MA, USA", "Concord, MA, USA"],
+            "origin_addresses": ["Boston, MA, USA", "Charlestown, Boston, MA, USA"],
+            "rows": [
+                {
+                    "elements": [
+                        {
+                            "distance": {"text": "33.3 km", "value": 33253},
+                            "duration": {"text": "27 mins", "value": 1620},
+                            "duration_in_traffic": {"text": "34 mins", "value": 2019},
+                            "status": "OK",
+                        },
+                        {
+                            "distance": {"text": "41.5 km", "value": 41491},
+                            "duration": {"text": "33 mins", "value": 1981},
+                            "duration_in_traffic": {"text": "39 mins", "value": 2342},
+                            "status": "OK",
+                        },
+                    ],
+                },
+                {
+                    "elements": [
+                        {
+                            "distance": {"text": "31.1 km", "value": 31100},
+                            "duration": {"text": "26 mins", "value": 1543},
+                            "duration_in_traffic": {"text": "29 mins", "value": 1754},
+                            "status": "OK",
+                        },
+                        {
+                            "distance": {"text": "39.3 km", "value": 39338},
+                            "duration": {"text": "32 mins", "value": 1904},
+                            "duration_in_traffic": {"text": "35 mins", "value": 2077},
+                            "status": "OK",
+                        },
+                    ],
+                },
+            ],
+            "status": "OK",
+        }
+        # l
+        # distance_matrix = np.zeros((len(overall_locations), len(overall_locations)))
+        # for index in range(1, len(overall_locations)):
+        #     for idx in range(1, len(overall_locations)):
+        #         distance_matrix[index, idx] = response["rows"][index - 1]["elements"][
+        #             idx - 1
+        #         ]["distance"]["value"]
+        # print(distance_matrix)
+        
+        distance_matrix = []
+        for row in response['rows']:
+            row_list = [row['elements'][j]['duration_in_traffic']['value'] for j in range(len(row['elements']))]
+            distance_matrix.append(row_list)
+        return distance_matrix
+
+        
     def create_data_model(self):
         """Stores the data for the problem."""
 
         data = {}
         data["distance_matrix"] = self.compute_geodisic_distance_matrix()
+        
+        print(data["distance_matrix"])
 
         data["demands"] = [0] + list(self.deliveries.values_list("weight", flat=True))
         # the quantity of the delivery in each delivery adress
@@ -144,7 +202,8 @@ class CVRP:  # pragma: no cover
                 )
                 route_data["vehicle"] = route_id
                 driver_dict = self.drivers.values()
-                route_data["driver_name"] = driver_dict[vehicle_id]["name"]
+                driver_name=driver_dict[vehicle_id]["name"]
+                route_data["driver_name"] = driver_name
 
                 route_data["distance"] = route_distance
                 route_data["load"] = route_load
@@ -157,12 +216,16 @@ class CVRP:  # pragma: no cover
 
                 # route_data["vehicle_capacity_utilization"] =[((route_load/driver["capacity"])*100)for driver in drivers_dict]
                 # print(route_data["vehicle_capacity_utilization"])
+               
+                   
 
                 path.append(manager.IndexToNode(index))
             path_adresses = [locations[i]["adress_name"] for i in path]
+            deliveries = [locations[i]["code"] for i in path[1:(len(path)-1)]]
             path_cordinates = [locations[i]["latlong"] for i in path]
             encoded_polyline = polyline.encode(path_cordinates, 5)
-            route_data["deliveries"] = len(path_adresses) - 2
+            route_data["num_deliveries"] = len(deliveries) 
+            route_data["deliveries"] = deliveries
             route_data["route"] = path_adresses
             route_data["encoded_polyline"] = encoded_polyline
 
@@ -172,10 +235,15 @@ class CVRP:  # pragma: no cover
 
             routes.append(plan_output)
             operations.append(route_data)
+            
             for route_data in operations[:]:
                 # Cleans the data to remove the route data if the distance==0
                 if route_data["distance"] == 0:
                     operations.remove(route_data)
+            
+            
+                
+            
 
             total_distance += route_distance
             total_load += route_load
@@ -187,7 +255,22 @@ class CVRP:  # pragma: no cover
                 "routes": operations,
                 "summary": routes,
             }
+        
+        for i in range(len(operations)):
+            trip_data=operations[i]
+            deliveries=operations[i]
+            code=trip_data["vehicle"]
+            driver=trip_data["driver_name"]
+            rider=self.drivers.get(name=driver)
+               
+            load=trip_data["load"]
+            vehicle_utilization= trip_data["vehicle_capacity_utilization"]
+            utilization=str(vehicle_utilization)
+            distance= trip_data["distance"]
 
+               
+            Trip.objects.create(code=code,load=load,utilization=utilization,distance=distance,rider=rider)
+            
         return (payload,)
 
     def generate_routes(self):
@@ -261,5 +344,4 @@ class CVRP:  # pragma: no cover
             return self.routing_solution(data, manager, routing, solution)
         raise RoutingException
 
-    
-            # should return routing failed and log the error(logger.info(routing.status()))
+        # should return routing failed and log the error(logger.info(routing.status()))

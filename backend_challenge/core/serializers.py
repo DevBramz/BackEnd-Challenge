@@ -7,6 +7,7 @@ from .models import Driver, RouteSettings, Delivery
 from django.core.exceptions import ObjectDoesNotExist
 from .Router import CVRP
 from .utilization import LoadOptimization
+from django.db.models import Q
 
 
 class RouteSettingsSerializer(serializers.ModelSerializer):
@@ -33,32 +34,40 @@ class RouteSettingsSerializer(serializers.ModelSerializer):
             # kilimani business center
             36.7815907,
         ]  # using this for now but would need to use teamhub adress from form data
+
         all_drivers = Driver.objects.all()
-        print(all_drivers)
 
         if obj.selection == "Min_Distance":
             drivers = all_drivers
-    
-            route = CVRP(
-            drivers,
-            deliveries,
-            start,
-        )  # Rout
 
+            route = CVRP(
+                drivers,
+                deliveries,
+                start,
+            )  # Rout
 
         elif obj.selection == "Min_Veh":
             optimization = LoadOptimization(deliveries, all_drivers)
             list_of_ids = optimization.main()
 
-            drivers = Driver.objects.filter(pk__in=list_of_ids)
-            print(list_of_ids)
-            route = CVRP(
-            drivers,
-            deliveries,
-            start,
-        )  # Rout
+            drivers = Driver.objects.filter(
+                pk__in=list_of_ids
+            )  # Filter query by list of IDS
+            # drivers2 = Driver.objects.in_bulk(list_of_ids)
+            print(drivers)
+            #
 
-        
+            # my_filter_qs = Q()
+            # for creator in creator_list:
+            #     my_filter_qs = my_filter_qs | Q(creator=creator)
+            # my_model.objects.filter(my_filter_qs)
+            # https://www.agiliq.com/blog/2019/05/django-rest-framework-listcreateapiview/
+            # request.POST.getlist('ukeys[]')
+            route = CVRP(
+                drivers,
+                deliveries,
+                start,
+            )  # Rout
 
         return route.generate_routes()
 
@@ -144,3 +153,16 @@ class ContactForm(serializers.Serializer):
 #         ]
 
 #         return result
+
+# class EventSerializer(serializers.Serializer):
+#     description = serializers.CharField(max_length=100)
+#     start = serializers.DateTimeField()
+#     finish = serializers.DateTimeField()
+
+#     def validate(self, data):
+#         """
+#         Check that start is before finish.
+#         """
+#         if data['start'] > data['finish']:
+#             raise serializers.ValidationError("finish must occur after start")
+#         return data

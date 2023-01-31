@@ -55,8 +55,11 @@ class LoadOptimization:
                 sum(x[(i, j)] * data["weights"][i] for i in data["items"])
                 <= y[j] * data["bin_capacities"][j]
             )
+        # if not bin capacity:
+        #     return  num_bin 
 
         # Objective: minimize the number of bins used.
+        
         solver.Minimize(solver.Sum([y[j] for j in data["bins"]]))
 
         status = solver.Solve()
@@ -83,3 +86,7 @@ class LoadOptimization:
             return bins_used
         else:
             raise RoutingException
+# https://routific-platform.readme.io/reference/retrieve-routes-for-an-existing-project      
+# https://route4me.io
+# https://www.youtube.com/watch?v=ZbeTVwUCu7k&t=134s
+# https://optimoroute.com/?utm_or_cid=745023496&utm_or_agid=37195258497&utm_or_fiid=&utm_or_tid=kwd-313645554680&utm_or_loc=1009824&utm_or_mt=e&utm_or_n=g&utm_or_crid=175547145508&utm_or_kw=optimoroute&utm_or_pl=&utm_or_tgt=&utm_or_pos=&gclsrc=aw.ds&gclid=CjwKCAiA5sieBhBnEiwAR9oh2rxwgOBSQ9D8EncxQtguSgGfzc2jjqsbF2yZS2NHv1XFj2MFyDVVtxoCmbMQAvD_BwE

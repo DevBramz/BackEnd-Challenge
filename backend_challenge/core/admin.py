@@ -4,8 +4,6 @@ from django.contrib.gis.admin import OSMGeoAdmin
 from .models import Delivery, Driver, RouteSettings, Trip
 
 
-
-
 @admin.register(RouteSettings)
 class RouteSettingsAdmin(OSMGeoAdmin):
     list_display = ("selection", "start_address")
@@ -13,7 +11,11 @@ class RouteSettingsAdmin(OSMGeoAdmin):
 
 @admin.register(Driver)
 class DriverAdmin(OSMGeoAdmin):
-    list_display = ("id","name", "capacity",)
+    list_display = (
+        "id",
+        "name",
+        "capacity",
+    )
 
 
 @admin.register(Delivery)
@@ -23,7 +25,16 @@ class DeliveryAdmin(OSMGeoAdmin):
 
 @admin.register(Trip)
 class TripAdmin(OSMGeoAdmin):
-    list_display = ("id", "code", "driver")
+    list_display = (
+        "id",
+        "code",
+        "rider",
+        "load",
+        "utilization",
+        "distance",
+        "depature_time",
+        
+    )
 
 
 # Register your models here.
