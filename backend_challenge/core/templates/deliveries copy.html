@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block title %}RouteSummary{% endblock %}
+{% block content %}
+
+ <div class="container">
+<div class="card shadow "style="box-sizing: border-box;
+
+
+top: 63px;
+
+background: #FFFFFF;
+border: 1.81193px solid #ECEEF7;
+border-radius: 6px;">
+
+<div class="d-flex align-items-center justify-content-between px-3" style=" margin-top:50px;">
+        <h1 class="h3" style="font-family: 'Fira Sans';
+font-style: normal;
+font-weight: 700;
+font-size: 20px;
+line-height: 24px;
+letter-spacing: 0.01em;
+
+color: #000000;">Routes and Trip Summary</h1>
+<!-- <div class="form-group has-search pt-3" >
+    <input type="text" class="form-control" placeholder="Search">
+  </div> -->
+     <!-- <div class="row no-gutters">
+     <div class="col">
+          <input class="form-control border-secondary border-right-0 rounded-0" type="search" value="search" id="example-search-input4">
+     </div>
+   
+</div> -->
+<!-- <h1>Drivers</h1>
+    <ul>
+        {% for driver in drivers %}
+        <li>{{ driver.name }}</li>
+        {% endfor %}
+    </ul>
+    </body></html> --> 
+ 
+
+              
+               
+
+               
+
+</div>
+    
+
+<!-- <div class="input-group">
+            <input class="form-control py-2 border-right-0 border" type="search" value="search" id="example-search-input">
+            <span class="input-group-append">
+                <div class="input-group-text bg-transparent"><i class="fa fa-search"></i></div>
+            </span>
+        </div>        -->
+
+    <div class=" py-3">
+        <button class="btn btn-primary" id="optimize-button">Dispatch</button>
+
+        <div class="toolbar float-right">
+              
+            </form>
+            
+            
+          
+        </div>
+    </div>
+    
+   
+        <div class="table-responsive p-3">
+            <table
+                id="deliveries-list"
+                class="table  table-sm"
+                style="width:100%"
+            >
+                <thead>
+                    <tr>
+                       
+
+                       <th>code</th>
+                       <th>phone</th>
+                       <th>weight</th>
+                       <th>address</th>
+                       <th>status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="card-body p-0">
+            <!-- Billing history table-->
+            
+        </div>
+</div>
+</div
+
+{% endblock content %}
+
+{% block extra_js %}
+    <script>
+        let data_url ="/api/v1/delivery/?format=datatables" ;
+        $(document).ready(function () {
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+              }
+            const csrftoken = getCookie('csrftoken');
+            var table = $('#deliveries-list').DataTable({
+                columnDefs: [ {
+                    orderable: false,
+                    className: 'select-checkbox',
+                    targets:   0
+                } ],
+                select: {
+                    style: 'multi'
+                },
+                'order': [[1, 'desc']],
+                'processing': false,
+                'serverSide': true,
+                
+                'ajax': {
+                    url: data_url,
+                    dataSrc: 'data'
+                },
+                columns: [
+                    {
+                        data: 'code',
+                        orderable: true
+                    },
+                    {
+                        data: 'phone',
+                        orderable: true
+                    },
+                    {
+                        data: 'weight',
+                        orderable: false
+                    },
+                    {
+                        data: 'address',
+                        orderable: false
+                    },
+                    {
+                        data: 'status',
+                        orderable: false
+                    }
+
+
+
+                ]
+            });
+
+            $('#optimize-button').on('click', function() {
+                var selected = [];
+                
+               // prevent the page from reload
+               
+                
+                var data = table.rows('.selected').data();
+                console.log(data);
+                data.each(function (value, index) {
+                    console.log(`For index ${index}, data value is ${value.code}`);
+                    selected.push(value.code);
+        
+                
+                });
+                alert(selected);
+                $.ajax({
+                    type: "POST",
+                    url: "/api/v1/delivery/get_selected/",
+                    data:{
+                       ids: JSON.stringify(selected),
+                       csrfmiddlewaretoken: csrftoken
+                       
+                       
+                    },
+                    success: function (data) {
+                        window.location="/api/v1/plan"
+                    },
+                    error: function (err) {
+                        console.log('error: album artist options:', err);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+
+<!-- <html><body>
+    <h1>Drivers</h1>
+    <ul>
+        {% for driver in drivers %}
+        <li>{{ driver.name }}</li>
+        {% endfor %}
+    </ul>
+    </body></html> -->

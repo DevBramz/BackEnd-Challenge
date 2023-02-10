@@ -121,6 +121,7 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
+        'rest_framework_datatables.renderers.DatatablesRenderer',
     ],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 }
@@ -182,6 +183,7 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 
 # Static files (CSS, JavaScript, Images)

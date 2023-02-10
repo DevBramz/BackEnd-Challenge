@@ -6,7 +6,7 @@ from .models import Delivery, Driver, RouteSettings, Trip
 
 @admin.register(RouteSettings)
 class RouteSettingsAdmin(OSMGeoAdmin):
-    list_display = ("selection", "start_address")
+    list_display = ("id","selection", "start_address")
 
 
 @admin.register(Driver)
@@ -20,7 +20,7 @@ class DriverAdmin(OSMGeoAdmin):
 
 @admin.register(Delivery)
 class DeliveryAdmin(OSMGeoAdmin):
-    list_display = ("id", "code", "address", "weight")
+    list_display = ("id", "code", "address", "weight","trip")
 
 
 @admin.register(Trip)
@@ -29,10 +29,13 @@ class TripAdmin(OSMGeoAdmin):
         "id",
         "code",
         "rider",
+        "num_deliveries",
         "load",
         "utilization",
         "distance",
         "depature_time",
+
+        
         
     )
 

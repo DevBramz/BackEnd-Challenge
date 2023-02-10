@@ -93,8 +93,9 @@ class RouteSettings(TimeStampedModel):
     avoid_highways = models.BooleanField(null=True)
     start_address = models.PointField(default=Point(36.798107, -1.283922))
     end_address = models.PointField(default=Point(36.798107, -1.283922))
-    depature_time = models.TimeField(blank=True, null=True, auto_now=True)
-    end_time = models.TimeField(blank=True, null=True, auto_now=True)
+    depature_time = models.TimeField(auto_now=True)
+    finish_time = models.TimeField(blank=True, null=True)
+    service_time=models.TimeField(blank=True, null=True)
 
     class Meta:
         verbose_name = _("RouteSettings")
@@ -123,6 +124,15 @@ class Delivery(TimeStampedModel):
         blank=True,
         null=True,
     )
+    phone = models.CharField(
+        max_length=13,
+        validators=[
+            RegexValidator(
+                regex=r"^\+254\d{9}$",
+                message="Phone number must be entered in the format '+254234567892'. Up to 12 digits allowed with no",
+            ),
+        ],
+    )
     weight = models.PositiveIntegerField(
         default=1,
         verbose_name="Quantity/Weight",
@@ -134,7 +144,7 @@ class Delivery(TimeStampedModel):
     trip = models.ForeignKey(
         "Trip",
         related_name="trip_deliveries",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
@@ -183,15 +193,32 @@ class Delivery(TimeStampedModel):
 
 
 class Trip(TimeStampedModel):
-    code = models.CharField(max_length=100, blank=True)
+    code = models.CharField(max_length=100, blank=True,editable=False)
     # driver = models.CharField(max_length=100, blank=True)
     distance = models.CharField(max_length=100, blank=True, null=True)
     load = models.CharField(max_length=100, blank=True)
-    utilization = models.CharField(max_length=100, blank=True)
+    utilization = models.CharField(max_length=100, blank=True,editable=False)
     rider = models.ForeignKey(
         "Driver", related_name="driver_trips", null=True, on_delete=models.CASCADE
     )
+    num_deliveries= models.CharField(max_length=100, blank=True,default=1,editable=False)
     depature_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    
+    
+    
+    @property
+    def trip_deliveries(self):
+        # lat = self.delivery_adress.y
+        # long = self.delivery_adress.x
+        # location_list = [lat, long]
+        # location_info = {
+        #     "code": self.code,
+        #     "adress_name": self.address,
+        #     "latlong": location_list,
+        trip_deliveries=Delivery.objects.filter(trip=self).count()
+        
+        print(trip_deliveries)
+        return trip_deliveries
 
     # duration=models.CharField(max_length=100, blank=True)
 
@@ -212,7 +239,7 @@ class Trip(TimeStampedModel):
         super().save(**kwargs)
 
     def __str__(self):
-        return str(self.id)
+        return str(self.code)
 
     # Routes are created which minimize the total number of miles driven by your workers.
     # This will reduce the overall cost to complete the route,
@@ -227,4 +254,4 @@ class Trip(TimeStampedModel):
 #     To avoid any issue with rounding, you can scale the distance matrix: multiply all entries of the matrix by a large number — say 100. This multiplies the length of any route by a factor of 100, but it doesn't change the solution. The advantage is that now when you round the matrix entries, the rounding amount (which is at most 0.5), is very small compared to the distances, so it won't affect the solution significantly.
 
 # If you scale the distance matrix, you also need to change the solution printer to divide the scaled route lengths by the scaling factor, so that it displays the unscaled distances of the routes.
-# Maximum tasks per driver.
+# Maximum tasks per driver.https://www.traccar.org/

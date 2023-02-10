@@ -1,0 +1,13 @@
+{% load rest_framework %}
+
+<html><body>
+
+<h1>Profile - </h1>
+
+<form action="/api/v1/settings" method="POST">
+    {% csrf_token %}
+    {% render_form serializer %}
+    <input type="submit" value="Save">
+</form>
+
+</body></html>

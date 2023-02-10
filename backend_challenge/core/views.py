@@ -1,6 +1,9 @@
 import csv
 import json
 from django.http import HttpResponse
+from backend_challenge.core.Router import CVRP
+from backend_challenge.core.exceptions import RoutingException
+from backend_challenge.core.utilization import LoadOptimization
 from rest_framework import status, viewsets, filters
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
@@ -13,12 +16,26 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.decorators import api_view, permission_classes
-from .models import Delivery, Driver, RouteSettings
+from .models import Delivery, Driver, RouteSettings, Trip
 from .serializers import RouteSettingsSerializer, DeliverySerializer, ContactForm
 from .tasks import send_sms
 from django.template.defaultfilters import slugify
 from rest_framework.reverse import reverse
-from django.shortcuts import redirect
+from django.shortcuts import redirect,render
+from rest_framework.decorators import api_view
+from django.shortcuts import get_object_or_404
+
+
+def index(request):
+    return render(request, 'deliveries.html')
+
+def update_settings(request, id):
+    settings = get_object_or_404(RouteSettings, id=id)
+    
+    return render(request, 'update_settings.html')
+
+
+
 
 
 class DeliveryViewSet(viewsets.ModelViewSet):
@@ -30,6 +47,7 @@ class DeliveryViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ["status"]
     search_fields = ["code", "status"]
+    # renderer_classes = [TemplateHTMLRenderer]
 
     def get_queryset(self):
         """
@@ -45,6 +63,8 @@ class DeliveryViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+    # data = {'deliveries': queryset}
+    # return Response(data, template_name='deliveries.html')
 
     @action(detail=True)
     def assign(self, request, pk=None):
@@ -71,6 +91,28 @@ class DeliveryViewSet(viewsets.ModelViewSet):
         else:
             not_found = {"errors": "No drivers available."}
             return Response(data=not_found, status=status.HTTP_400_BAD_REQUEST)
+        
+    @action(detail=False, methods=['POST'],)   
+    def get_selected(self, request):
+        
+        data = request.data
+       
+        ids=data.get("ids", None)
+        request.session["selected"]=ids
+        
+        if ids :
+            id_list=json.loads(ids)
+            deliveries=Delivery.objects.filter(
+                code__in=id_list
+            )
+            
+            
+
+            serializer = self.get_serializer(deliveries, many=True)
+            # }
+            #raise Exception
+           
+            return Response(serializer.data)
 
     # @action(detail=False)
     # def export_deliveries(self, request, *args, **kwargs):
@@ -89,6 +131,7 @@ class DeliveryViewSet(viewsets.ModelViewSet):
         Method to export orders
         """
         data = request.data
+        data2 = request.POST.getlist("data")
 
         selected_ids = data.get("data", None)
         if selected_ids:
@@ -126,10 +169,11 @@ class DeliveryViewSet(viewsets.ModelViewSet):
                 "status": delivery.status,
                 "weight": delivery.weight,
                 "address": delivery.address,
-                
-                "url": reverse("core:delivery-detail", args=[delivery.id], request=request),
+                "url": reverse(
+                    "core:delivery-detail", args=[delivery.id], request=request
+                ),
             }
-            return Response(data,status=status.HTTP_201_CREATED)
+            return Response(data, status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -168,21 +212,171 @@ class RouteViewSet(viewsets.ModelViewSet):
 
 
 class Contact(APIView):
-    serializer_class = ContactForm
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'drivers.html'
 
-    def post(self, request, **kwargs):
-        """
-        Get the entire edit history for a comment
-        :param request:
-        :param kwargs:
-        :return:
-        """
-        data = request.data
+    def get(self, request):
+        queryset = Driver.objects.all()
+        return Response({'drivers': queryset})
+    # serializer_class = ContactForm
+
+    # def get(self, request, **kwargs):
+    #     """
+    #     Get the entire edit history for a comment
+    #     :param request:
+    #     :param kwargs:
+    #     :return:
+    #     """
+    #     data = request.data
+
+    #     serializer = self.serializer_class(data)
+
+    #     return Response(serializer.data, status.HTTP_200_OK)
+
+def plan_routes(request):
+    selected_delivery_codes=request.session.get("selected")
+    if not selected_delivery_codes :
+        raise RoutingException
+    codes_list=json.loads(selected_delivery_codes)
+    deliveries=Delivery.objects.filter(
+                code__in=codes_list
+            )
+    
+    optimization_settings=RouteSettings.objects.last()
+    all_drivers = Driver.objects.all()
+    start=optimization_settings.start_address
         
+    if optimization_settings.selection == "Min_Distance":
+                drivers = all_drivers
 
-        serializer = self.serializer_class(data)
+                route = CVRP(
+                    drivers,
+                    deliveries,
+                    start,
+                )  # Rout
 
-        return Response(serializer.data, status.HTTP_200_OK)
+    elif optimization_settings.selection == "Min_Veh":
+                optimization = LoadOptimization(deliveries, all_drivers)
+                list_of_ids = optimization.main()
+
+                drivers = Driver.objects.filter(
+                    pk__in=list_of_ids)
+                
+                route = CVRP(
+                    drivers,
+                    deliveries,
+                    start,
+                )  # Rout
+                
+    
+    routes_summary= route.generate_routes()
+    trip_data=routes_summary.get("routes",None)
+    summary=routes_summary.get("summary",None)
+    
+    
+    request.session["trip_data"] = trip_data
+    print(summary)
+    context = {'route_summary': summary}
+    # return render(request, 'summary.html',context)
+    return redirect('/api/v1/dispatch')
+
     
     
     
+    
+    
+    
+   
+    
+    
+
+@api_view()
+def dispatch_routes(request):
+    """
+    Creates trip from routes
+    """
+    routes = request.session.get("trip_data", None)
+    
+
+    if routes:
+        for i, route in enumerate(routes):
+            # trip_data = routes[i]
+            driver = route["driver_name"]
+            rider = Driver.objects.get(name=driver)
+
+            load = route["load"]
+            vehicle_utilization =route["vehicle_capacity_utilization"]
+            utilization = str(vehicle_utilization)
+            distance = route["distance"]
+            tasks = route["deliveries"]
+            deliverys = Delivery.objects.filter(code__in=tasks)
+            delis = str(deliverys.count())
+
+            trip = Trip.objects.create(
+                    load=load,
+                    utilization=utilization,
+                    distance=distance,
+                    rider=rider,
+                    num_deliveries=delis,
+                    
+                )
+            
+            for delivery in deliverys:
+                delivery.trip = trip
+                delivery.save()
+        del request.session["trip_data"]
+        del request.session["selected"]
+        return Response({"message": "Trip_created"})
+    return Response({"message": "No Trip_created"})
+  
+class SettingsDetail(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'settings_detail.html'
+
+    def get(self, request):
+        settings = RouteSettings.objects.first()
+        serializer = RouteSettingsSerializer(settings)
+        return Response({'serializer': serializer, 'settings': settings})
+
+    def post(self, request,):
+        settings = RouteSettings.objects.first()
+        serializer = RouteSettingsSerializer(settings, data=request.data)
+        if not serializer.is_valid():
+            return Response({'serializer': serializer, 'settings': settings})
+        serializer.save()
+        return redirect('delivery-list')    
+
+
+#  def post(self, request, *args, **kwargs):
+#         order_items = {
+#             'items': []
+#         }
+
+#         items = request.POST.getlist('items[]')
+
+#         for item in items:
+#             menu_item = MenuItem.objects.get(pk__contains=int(item))
+#             item_data = {
+#                 'id': menu_item.pk,
+#                 'name': menu_item.name,
+#                 'price': menu_item.price
+#             }
+
+#             order_items['items'].append(item_data)
+
+#             price = 0
+#             item_ids = []
+
+#         for item in order_items['items']:
+#             price += item['price']
+#             item_ids.append(item['id'])
+
+#         order = OrderModel.objects.create(price=price)
+#         order.items.add(*item_ids)
+
+#         context = {
+#             'items': order_items['items'],
+#             'price': price
+#         }
+
+#         return render(request, 'customer/order_confirmation.html', context)

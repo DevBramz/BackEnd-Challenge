@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Deliveries{% endblock %}
+{% block content %}
+
+ <div class="container">
+<div class="card shadow "style="box-sizing: border-box;
+
+
+
+top: 63px;
+
+background: #FFFFFF;
+border: 1.81193px solid #ECEEF7;
+border-radius: 6px;">
+
+
+{% for route in route_summary %}
+{{ route}}</a>
+{% endfor %}
+
+
+<!-- <div class="form-group has-search pt-3" >
+    <input type="text" class="form-control" placeholder="Search">
+  </div> -->
+     <!-- <div class="row no-gutters">
+     <div class="col">
+          <input class="form-control border-secondary border-right-0 rounded-0" type="search" value="search" id="example-search-input4">
+     </div>
+   
+</div> -->
+<!-- <h1>Drivers</h1>
+    <ul>
+        {% for driver in drivers %}
+        <li>{{ driver.name }}</li>
+        {% endfor %}
+    </ul>
+    </body></html> --> 
+ 
+
+              
+               
+
+               
+
+</div>
+
+
+<!-- <div class="input-group">
+            <input class="form-control py-2 border-right-0 border" type="search" value="search" id="example-search-input">
+            <span class="input-group-append">
+                <div class="input-group-text bg-transparent"><i class="fa fa-search"></i></div>
+            </span>
+        </div>        -->
+
+    <div class=" py-3">
+        <button class="btn btn-primary" id="optimize-button">Dispatch</button>
+
+        <div class="toolbar float-right">
+              
+            </form>
+            
+            
+          
+        </div>
+    </div>
+    
+   
+        <div class="table-responsive p-3">
+            <table
+                id="deliveries-list"
+                class="table  table-sm"
+                style="width:100%"
+            >
+                <thead>
+                    <tr>
+                       
+
+                       <th>code</th>
+                       <th>phone</th>
+                       <th>weight</th>
+                       <th>address</th>
+                       <th>status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="card-body p-0">
+            <!-- Billing history table-->
+            
+        </div>
+</div>
+</div
+
+{% endblock content %}
