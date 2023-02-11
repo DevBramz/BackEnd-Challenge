@@ -11,8 +11,10 @@ from .views import (
     RouteViewSet,
     Contact,
     SettingsDetail,
+    TripViewSet,
     dispatch_routes,
     plan_routes,
+    view_route_summary,
     
    
 )
@@ -24,7 +26,9 @@ delivery_router = DefaultRouter()
 
 export_router = DefaultRouter()
 optimize_router = DefaultRouter()
+trip_router=DefaultRouter()
 delivery_router.register("delivery", DeliveryViewSet, basename="delivery")
+trip_router.register("trip", TripViewSet, basename="trip")
 
 optimize_router.register("route", RouteViewSet, basename="route")
 
@@ -34,15 +38,17 @@ urlpatterns = [
     # path("", include(order_router.urls)),
     path("", include(delivery_router.urls)),
     path("", include(optimize_router.urls)),
+    path("", include(trip_router.urls)),
   
     path("contact", Contact.as_view()),
     path("settings",  SettingsDetail.as_view(),name='settings'),
     path("plan", plan_routes,name='plan_routes'),
     path("dispatch", dispatch_routes),
     path('delis', views.index, name='delis'),
+    path('route_summary',view_route_summary , name='route_summary')
     # path('update/<int:todoId>/', views.update_settings, name='settings')
    
     # path("customer", views.Customer_Create.as_view(), name="customer"),
-    # path("order", OrderListCreateAPIView.as_view(), name="order"),
+    
    
 ]

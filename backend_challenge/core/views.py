@@ -1,6 +1,6 @@
 import csv
 import json
-from django.http import HttpResponse
+from django.http import HttpResponse,JsonResponse
 from backend_challenge.core.Router import CVRP
 from backend_challenge.core.exceptions import RoutingException
 from backend_challenge.core.utilization import LoadOptimization
@@ -17,13 +17,15 @@ from rest_framework.decorators import action
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.decorators import api_view, permission_classes
 from .models import Delivery, Driver, RouteSettings, Trip
-from .serializers import RouteSettingsSerializer, DeliverySerializer, ContactForm
+from .serializers import RouteSettingsSerializer, DeliverySerializer, ContactForm, TripSerializer
 from .tasks import send_sms
 from django.template.defaultfilters import slugify
 from rest_framework.reverse import reverse
 from django.shortcuts import redirect,render
 from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
+
+
 
 
 def index(request):
@@ -33,6 +35,10 @@ def update_settings(request, id):
     settings = get_object_or_404(RouteSettings, id=id)
     
     return render(request, 'update_settings.html')
+
+def view_route_summary(request):
+    
+    return render(request, 'summary.html')
 
 
 
@@ -62,6 +68,7 @@ class DeliveryViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
 
         serializer = self.get_serializer(queryset, many=True)
+        print(serializer.data)
         return Response(serializer.data)
     # data = {'deliveries': queryset}
     # return Response(data, template_name='deliveries.html')
@@ -186,6 +193,15 @@ class RouteViewSet(viewsets.ModelViewSet):
 
     queryset = RouteSettings.objects.all()
     serializer_class = RouteSettingsSerializer
+    
+class TripViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for trip crud 
+    """
+
+    queryset = Trip.objects.all()
+    serializer_class = TripSerializer
+
 
 
 # def update(self, request, *args, **kwargs):
@@ -232,7 +248,7 @@ class Contact(APIView):
     #     serializer = self.serializer_class(data)
 
     #     return Response(serializer.data, status.HTTP_200_OK)
-
+@api_view()
 def plan_routes(request):
     selected_delivery_codes=request.session.get("selected")
     if not selected_delivery_codes :
@@ -271,14 +287,27 @@ def plan_routes(request):
     
     routes_summary= route.generate_routes()
     trip_data=routes_summary.get("routes",None)
-    summary=routes_summary.get("summary",None)
+    summary=routes_summary.get("routes",None)
+    
+    # print(type(summary))
+#     ordinary_dict = {'a': 'one', 'b': 'two', }
+# query_dict = QueryDict('', mutable=True)
+# query_dict.update(ordinary_dict)
+
     
     
     request.session["trip_data"] = trip_data
-    print(summary)
-    context = {'route_summary': summary}
+    # print(summary)
+    # context = {'route_summary': summary}
+    # summary_json=json.dumps(summary)
+    # print(summary_json)
+    # data=summary
+    
+    # return JsonResponse(data, safe=False)
+   
     # return render(request, 'summary.html',context)
-    return redirect('/api/v1/dispatch')
+    return Response(summary)
+    # return redirect('/api/v1/dispatch')
 
     
     
@@ -302,7 +331,7 @@ def dispatch_routes(request):
         for i, route in enumerate(routes):
             # trip_data = routes[i]
             driver = route["driver_name"]
-            rider = Driver.objects.get(name=driver)
+            driver = Driver.objects.get(name=driver)
 
             load = route["load"]
             vehicle_utilization =route["vehicle_capacity_utilization"]
@@ -316,13 +345,14 @@ def dispatch_routes(request):
                     load=load,
                     utilization=utilization,
                     distance=distance,
-                    rider=rider,
+                    driver=driver,
                     num_deliveries=delis,
                     
                 )
             
             for delivery in deliverys:
                 delivery.trip = trip
+                delivery.status = "assigned"
                 delivery.save()
         del request.session["trip_data"]
         del request.session["selected"]

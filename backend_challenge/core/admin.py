@@ -28,7 +28,7 @@ class TripAdmin(OSMGeoAdmin):
     list_display = (
         "id",
         "code",
-        "rider",
+        "driver",
         "num_deliveries",
         "load",
         "utilization",

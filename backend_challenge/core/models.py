@@ -198,11 +198,15 @@ class Trip(TimeStampedModel):
     distance = models.CharField(max_length=100, blank=True, null=True)
     load = models.CharField(max_length=100, blank=True)
     utilization = models.CharField(max_length=100, blank=True,editable=False)
-    rider = models.ForeignKey(
+    driver= models.ForeignKey(
         "Driver", related_name="driver_trips", null=True, on_delete=models.CASCADE
     )
     num_deliveries= models.CharField(max_length=100, blank=True,default=1,editable=False)
     depature_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    duration=models.DurationField(blank=True, null=True)
+    fuel_consumption=models.PositiveIntegerField(blank=True, null=True)
+    estimated_completion_time=models.DateTimeField(blank=True, null=True)
+    completed_time= models.DateTimeField(blank=True, null=True)
     
     
     

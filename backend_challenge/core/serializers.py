@@ -3,7 +3,7 @@ import json
 from rest_framework import serializers
 from rest_framework.exceptions import APIException, NotFound, ValidationError
 
-from .models import Driver, RouteSettings, Delivery
+from .models import Driver, RouteSettings, Delivery, Trip
 from django.core.exceptions import ObjectDoesNotExist
 from .Router import CVRP
 from .utilization import LoadOptimization
@@ -70,6 +70,12 @@ class RouteSettingsSerializer(serializers.ModelSerializer):
     #         )  # Rout
 
     #     return route.generate_routes(request)
+class TripSerializer(serializers.ModelSerializer):
+    # routes_data = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Trip
+        fields = "__all__"
 
 
 class DeliverySerializer(serializers.ModelSerializer):
