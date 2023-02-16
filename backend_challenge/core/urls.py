@@ -43,8 +43,10 @@ urlpatterns = [
     path("contact", Contact.as_view()),
     path("settings",  SettingsDetail.as_view(),name='settings'),
     path("plan", plan_routes,name='plan_routes'),
+    path('trips', views.trips, name='trips'),
     path("dispatch", dispatch_routes),
     path('delis', views.index, name='delis'),
+   
     path('route_summary',view_route_summary , name='route_summary')
     # path('update/<int:todoId>/', views.update_settings, name='settings')
    

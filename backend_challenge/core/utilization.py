@@ -90,3 +90,7 @@ class LoadOptimization:
 # https://route4me.io
 # https://www.youtube.com/watch?v=ZbeTVwUCu7k&t=134s
 # https://optimoroute.com/?utm_or_cid=745023496&utm_or_agid=37195258497&utm_or_fiid=&utm_or_tid=kwd-313645554680&utm_or_loc=1009824&utm_or_mt=e&utm_or_n=g&utm_or_crid=175547145508&utm_or_kw=optimoroute&utm_or_pl=&utm_or_tgt=&utm_or_pos=&gclsrc=aw.ds&gclid=CjwKCAiA5sieBhBnEiwAR9oh2rxwgOBSQ9D8EncxQtguSgGfzc2jjqsbF2yZS2NHv1XFj2MFyDVVtxoCmbMQAvD_BwE
+# https://blog.route4me.com/logistics-technology/
+# https://blog.route4me.com/different-routing-scenarios-in-logistics/
+# https://blog.route4me.com/logistics-technology/
+

@@ -2,7 +2,7 @@ import csv
 import json
 from django.http import HttpResponse,JsonResponse
 from backend_challenge.core.Router import CVRP
-from backend_challenge.core.exceptions import RoutingException
+from backend_challenge.core.exceptions import CVRPException, RoutingException
 from backend_challenge.core.utilization import LoadOptimization
 from rest_framework import status, viewsets, filters
 from django.db import transaction
@@ -18,18 +18,23 @@ from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.decorators import api_view, permission_classes
 from .models import Delivery, Driver, RouteSettings, Trip
 from .serializers import RouteSettingsSerializer, DeliverySerializer, ContactForm, TripSerializer
-from .tasks import send_sms
+from .tasks import send_sms_recepient
 from django.template.defaultfilters import slugify
 from rest_framework.reverse import reverse
 from django.shortcuts import redirect,render
 from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
+from django.forms.models import model_to_dict
+from django.core.exceptions import ValidationError
 
 
 
 
 def index(request):
     return render(request, 'deliveries.html')
+
+def trips(request):
+    return render(request, 'trips.html')
 
 def update_settings(request, id):
     settings = get_object_or_404(RouteSettings, id=id)
@@ -68,7 +73,6 @@ class DeliveryViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
 
         serializer = self.get_serializer(queryset, many=True)
-        print(serializer.data)
         return Response(serializer.data)
     # data = {'deliveries': queryset}
     # return Response(data, template_name='deliveries.html')
@@ -102,24 +106,19 @@ class DeliveryViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['POST'],)   
     def get_selected(self, request):
         
-        data = request.data
-       
-        ids=data.get("ids", None)
+        ids = request.data.get("ids")
+        # if not ids:
+        #     raise ValidationError("No deliveries were selected")
+        id_list=json.loads(ids)
         request.session["selected"]=ids
+        deliveries=Delivery.objects.filter(
+                    code__in=id_list
+                )
+        serializer = self.get_serializer(deliveries, many=True)
+        return Response(serializer.data)
         
-        if ids :
-            id_list=json.loads(ids)
-            deliveries=Delivery.objects.filter(
-                code__in=id_list
-            )
-            
-            
-
-            serializer = self.get_serializer(deliveries, many=True)
-            # }
-            #raise Exception
-           
-            return Response(serializer.data)
+        
+        
 
     # @action(detail=False)
     # def export_deliveries(self, request, *args, **kwargs):
@@ -199,8 +198,11 @@ class TripViewSet(viewsets.ModelViewSet):
     A simple ViewSet for trip crud 
     """
 
-    queryset = Trip.objects.all()
+    queryset = Trip.objects.filter(status='dispatched').order_by("-edited")
     serializer_class = TripSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ["status"]
+    search_fields = ["code", "status"]
 
 
 
@@ -251,51 +253,61 @@ class Contact(APIView):
 @api_view()
 def plan_routes(request):
     selected_delivery_codes=request.session.get("selected")
-    if not selected_delivery_codes :
+
+    if not selected_delivery_codes:
         raise RoutingException
+    
+        
     codes_list=json.loads(selected_delivery_codes)
     deliveries=Delivery.objects.filter(
-                code__in=codes_list
-            )
-    
-    optimization_settings=RouteSettings.objects.last()
-    all_drivers = Driver.objects.all()
-    start=optimization_settings.start_address
+                    code__in=codes_list
+                )
         
-    if optimization_settings.selection == "Min_Distance":
-                drivers = all_drivers
+    optimization_settings=RouteSettings.objects.get(org__name="ibuQA")
+    print(optimization_settings.id)
+    # settings=model_to_dict(optimization_settings)
+    # settings=RouteSettingsSerializer(optimization_settings).data
+   
+    
+    
 
-                route = CVRP(
-                    drivers,
-                    deliveries,
-                    start,
-                )  # Rout
+    all_drivers = Driver.objects.all().order_by("id")
+    start=optimization_settings.start_address
+            
+    if optimization_settings.selection == "Min_Distance":
+                    drivers = all_drivers
+                    
+
+                    route = CVRP(
+                        drivers,
+                        deliveries,
+                        start,
+                    )  # Rout
 
     elif optimization_settings.selection == "Min_Veh":
-                optimization = LoadOptimization(deliveries, all_drivers)
-                list_of_ids = optimization.main()
 
-                drivers = Driver.objects.filter(
-                    pk__in=list_of_ids)
-                
-                route = CVRP(
-                    drivers,
-                    deliveries,
-                    start,
-                )  # Rout
-                
-    
+                    optimization = LoadOptimization(deliveries, all_drivers)
+                    list_of_ids = optimization.main()
+
+                    drivers = all_drivers.filter(
+                        pk__in=list_of_ids)
+                    
+                    
+                    
+                    route = CVRP(
+                        drivers,
+                        deliveries,
+                        start,
+                    )  # Rout
+                    
+        
     routes_summary= route.generate_routes()
     trip_data=routes_summary.get("routes",None)
-    summary=routes_summary.get("routes",None)
-    
-    # print(type(summary))
-#     ordinary_dict = {'a': 'one', 'b': 'two', }
-# query_dict = QueryDict('', mutable=True)
-# query_dict.update(ordinary_dict)
+        
+      
 
-    
-    
+        
+        
     request.session["trip_data"] = trip_data
     # print(summary)
     # context = {'route_summary': summary}
@@ -306,7 +318,7 @@ def plan_routes(request):
     # return JsonResponse(data, safe=False)
    
     # return render(request, 'summary.html',context)
-    return Response(summary)
+    return Response(trip_data)
     # return redirect('/api/v1/dispatch')
 
     
@@ -322,59 +334,72 @@ def plan_routes(request):
 @api_view()
 def dispatch_routes(request):
     """
-    Creates trip from routes
+    Creates and dispatches trip from routes
     """
     routes = request.session.get("trip_data", None)
     
 
     if routes:
-        for i, route in enumerate(routes):
-            # trip_data = routes[i]
-            driver = route["driver_name"]
-            driver = Driver.objects.get(name=driver)
+        with transaction.atomic():
+            for i, route in enumerate(routes):
+                driver = route["driver_name"]
+                driver = Driver.objects.get(name=driver)
 
-            load = route["load"]
-            vehicle_utilization =route["vehicle_capacity_utilization"]
-            utilization = str(vehicle_utilization)
-            distance = route["distance"]
-            tasks = route["deliveries"]
-            deliverys = Delivery.objects.filter(code__in=tasks)
-            delis = str(deliverys.count())
+                load = route["load"]
+                vehicle_utilization =route["vehicle_capacity_utilization"]
+                utilization = str(vehicle_utilization)
+                distance = route["distance"]
+                tasks = route["deliveries"]
+                deliverys = Delivery.objects.filter(code__in=tasks)
+                num_deliveries = str(deliverys.count())
 
-            trip = Trip.objects.create(
-                    load=load,
-                    utilization=utilization,
-                    distance=distance,
-                    driver=driver,
-                    num_deliveries=delis,
+                trip = Trip.objects.create(
+                        load=load,
+                        utilization=utilization,
+                        distance=distance,
+                        driver=driver,
+                        num_deliveries=num_deliveries,
+                        # departure_time=departure_time
+                       
+                        
+                    )
+                trip.dispatch()
+            #   send sms  post save signal
+               
+                
+                
+                for delivery in deliverys:
+                    delivery.trip = trip
+                    delivery.status = "dispatched"
+                    delivery.phone='+254728826517'
+                    delivery.save()
+                    # trip.deliveries_in_trip.add(delivery)
+                    # send_sms_recepient(delivery.id)
+                # transaction.on_commit(lambda:send_sms_recepient.delay(delivery))
                     
-                )
+            # print(trip.deliveries_in_trip.all())
             
-            for delivery in deliverys:
-                delivery.trip = trip
-                delivery.status = "assigned"
-                delivery.save()
-        del request.session["trip_data"]
-        del request.session["selected"]
-        return Response({"message": "Trip_created"})
-    return Response({"message": "No Trip_created"})
+            del request.session["trip_data"]
+            del request.session["selected"]
+            return Response({"message": "Trip_created"})
+    raise Exception('No Trip data')
   
 class SettingsDetail(APIView):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'settings_detail.html'
 
     def get(self, request):
-        settings = RouteSettings.objects.first()
+        settings = RouteSettings.objects.last()
         serializer = RouteSettingsSerializer(settings)
         return Response({'serializer': serializer, 'settings': settings})
 
     def post(self, request,):
-        settings = RouteSettings.objects.first()
+        settings = RouteSettings.objects.last()
         serializer = RouteSettingsSerializer(settings, data=request.data)
         if not serializer.is_valid():
             return Response({'serializer': serializer, 'settings': settings})
         serializer.save()
-        return redirect('delivery-list')    
+        return redirect('/api/v1/route_summary')    
 
 
 #  def post(self, request, *args, **kwargs):

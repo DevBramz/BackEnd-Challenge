@@ -15,67 +15,28 @@ class RouteSettingsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RouteSettings
-        fields = "__all__"
+        fields = [ "selection","start_location", "end_location","departure_time","finish_time",]
 
-    # def get_routes_data(self, obj):
-    #     """returns route route path"""
-    #     deliveries = Delivery.objects.filter(
-    #         status="pending"
-    #     )  # using this for now but would need to use the selected deliveries from datatable
-    #     request = self.context["request"]
-    #     # start = [
-    #     #     -1.2841,
-    #     #     36.8155,
-    #     # ]  # using this for now but would need to use teamhub adress from form data
-
-    #     # num_drivers=Driver.objects.filter(available=True)
-    #     start = [
-    #         -1.2951239,
-    #         # kilimani business center
-    #         36.7815907,
-    #     ]  # using this for now but would need to use teamhub adress from form data
-
-    #     all_drivers = Driver.objects.all()
-
-    #     if obj.selection == "Min_Distance":
-    #         drivers = all_drivers
-
-    #         route = CVRP(
-    #             drivers,
-    #             deliveries,
-    #             start,
-    #         )  # Rout
-
-    #     elif obj.selection == "Min_Veh":
-    #         optimization = LoadOptimization(deliveries, all_drivers)
-    #         list_of_ids = optimization.main()
-
-    #         drivers = Driver.objects.filter(
-    #             pk__in=list_of_ids
-    #         )  # Filter query by list of IDS
-    #         # drivers2 = Driver.objects.in_bulk(list_of_ids)
-
-    #         #
-
-    #         # my_filter_qs = Q()
-    #         # for creator in creator_list:
-    #         #     my_filter_qs = my_filter_qs | Q(creator=creator)
-    #         # my_model.objects.filter(my_filter_qs)
-    #         # https://www.agiliq.com/blog/2019/05/django-rest-framework-listcreateapiview/
-    #         # request.POST.getlist('ukeys[]')
-    #         route = CVRP(
-    #             drivers,
-    #             deliveries,
-    #             start,
-    #         )  # Rout
-
-    #     return route.generate_routes(request)
+    
 class TripSerializer(serializers.ModelSerializer):
+       
     # routes_data = serializers.SerializerMethodField()
+    driver_capacity= serializers.SerializerMethodField()
+    driver= serializers.SerializerMethodField()
 
     class Meta:
         model = Trip
-        fields = "__all__"
+        fields = [ "id", "code","status", "driver","num_deliveries","load","utilization","distance","driver_capacity","depature_time",]\
+            
+        
+    def get_driver_capacity(self, obj):
+        """Serializer method to return obj location in lat,long"""
+        return obj.driver.capacity
+    
+    def get_driver(self, obj):
+        """Serializer method to return obj location in lat,long"""
+        return obj.driver.name
+        
 
 
 class DeliverySerializer(serializers.ModelSerializer):

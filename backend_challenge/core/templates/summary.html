@@ -47,27 +47,45 @@ border-radius: 6px;">
             <span class="input-group-append">
                 <div class="input-group-text bg-transparent"><i class="fa fa-search"></i></div>
             </span>
-        </div>        -->
+        </div> 
+    https://datatables.net/extensions/select/examples/initialisation/checkbox.html       -->
         <div>
             <div id="div2">Route Summary
-            <div id="div3"></div>
+            <button class="btn btn-primary" id="dispatch-button">Dispatch</button>
+            
         </div>
         </div>
         
-        <div class=" py-3">
-            <button class="btn btn-primary" id="dispatch-button">Dispatch</button>
-    
-            <div class="toolbar float-right">
-                  
-                </form>
-                
-                
+       
+        <div id="result" class="hide">
+            <table id="table1">
+              <thead>
+                <tr>
+                  <th>Route</th>
+                  <th>Driver</th>
+                  <th>Deliveries</th>
+                  <th>Load</th>
+                  <th>Vehicle-Capacity</th>
+                  <th>Utilization</th>
+                  <th>Distance</th>
+                 
+                  <th>Path</th>
+                </tr>
+              </thead>
+              <tbody id="tb"></tbody>
+            </table>
+          </div>
+          <div class="toolbar float-left">
+            <button class="btn btn-primary" id="dispatch-button">Back to Settings </button>
+
               
-            </div>
+            </form>
+            
+            
+          
         </div>
-    
    
-        <div class="table-responsive p-3">
+        <!-- <div class="table-responsive p-3">
             <table
                 id="deliveries-list"
                 class="table  table-sm"
@@ -83,7 +101,7 @@ border-radius: 6px;">
                     </tr>
                 </thead>
             </table>
-        </div>
+        </div> -->
         <div class="card-body p-0">
             <!-- Billing history table-->
             
@@ -101,7 +119,21 @@ border-radius: 6px;">
             success: function (data) {
                 $.each(data, function (index, value) {
                     console.log(value)
-                    $("#div3").append('Route'+ value['vehicle']+'  '+' ' + 'Driver:' + value['driver_name'] + ' ' + 'Deliveries:' + value['num_deliveries']+' '+'Capacity Utilization:' + value['vehicle_capacity_utilization']);
+                    $("#div3").append('Route'+ value['vehicle']+'  '+' ' + 'Driver:' + value['driver_name'] + ' ' + 'Deliveries:' + value['num_deliveries']+' '+'Utilization:' + value['vehicle_capacity_utilization']+ 'Route:' + value['route']);
+                const tb = document.getElementById("tb");
+                let tr = [];
+                data.forEach(item => {
+                      tr.push('<tr><td>' + item.vehicle + '</td>')
+                      tr.push('<td>' + item.driver_name + '</td>')
+                      tr.push('<td>' + item.num_deliveries+ '</td>')
+                      tr.push('<td>' + item.load+ '</td>')
+                      tr.push('<td>' + item.vehicle_capacity+ '</td>')
+                      tr.push('<td>' + item.vehicle_capacity_utilization + '</td>')
+                      tr.push('<td>' + item.distance + '</td>')
+                      tr.push('<td>' + item.route + '</td>')
+                    })
+                    tb.innerHTML = tr.join("");
+                    document.getElementById("result").classList.remove("hide"); // show
                 });
                 
                
@@ -123,7 +155,7 @@ border-radius: 6px;">
                 type: "GET",
                 url: "/api/v1/dispatch",
                 success: function (data) {
-                    window.location="/api/v1/delis"
+                    window.location="/api/v1/trips"
                 },
                 error: function (err) {
                     console.log('error: album artist options:', err);

@@ -1,13 +1,153 @@
+{% extends "base.html" %}
 {% load rest_framework %}
 
-<html><body>
 
-<h1>Profile - </h1>
+{% block content %}
+
+
+<h1>Route Optimization Settings  </h1>
 
 <form action="/api/v1/settings" method="POST">
     {% csrf_token %}
     {% render_form serializer %}
-    <input type="submit" value="Save">
+    <input type="submit" value="Plan Routes">
 </form>
+<!-- <form action="/api/v1/settings" method="POST">
+    {% csrf_token %}
 
-</body></html>
+  
+
+  
+
+  
+
+  
+    
+
+<div class="form-group ">
+  
+    <label>
+      Vehicle Selection
+    </label>
+  
+
+  <select class="form-control" name="selection">
+    
+    
+        
+          <option value="Min_Distance">Balance Driving Time and Vehicle Utilization</option>
+        
+    
+        
+          <option value="Min_Veh" selected="">Minimum Vehicle</option>
+        
+    
+        
+          <option value="MU">Manual</option>
+        
+    
+  </select>
+
+  
+
+  
+</div>
+
+  
+
+  
+    <div class="form-group ">
+  
+    <label>Max load time</label>
+  
+
+  <input name="max_load_time" class="form-control" type="text" value="">
+
+  
+
+  
+</div>
+
+  
+
+  
+    <div class="form-group ">
+  
+    <label>Start address</label>
+  
+
+  <input name="start_address" class="form-control" type="text" value="SRID=4326;POINT (36.798107 -1.283922)">
+
+  
+
+  
+</div>
+
+  
+
+  
+    <div class="form-group ">
+  
+    <label>End address</label>
+  
+
+  <input name="end_address" class="form-control" type="text" value="SRID=4326;POINT (36.798107 -1.283922)">
+
+  
+
+  
+</div>
+
+  
+
+  
+    <div class="form-group ">
+  
+    <label>Departure time</label>
+  
+
+  <input name="departure_time" class="form-control" type="time" value="">
+
+  
+
+  
+</div>
+
+  
+
+  
+    <div class="form-group ">
+  
+    <label>Finish time</label>
+  
+
+  <input name="finish_time" class="form-control" type="time" value="">
+
+  
+
+  
+</div>
+
+  
+
+  
+    <div class="form-group ">
+  
+    <label>Service time</label>
+  
+
+  <input name="service_time" class="form-control" type="text" value="">
+
+  
+
+  
+</div>
+
+  
+
+
+    <input type="submit" value="Plan Routes">
+</form> -->
+
+</body>
+{% endblock content %}

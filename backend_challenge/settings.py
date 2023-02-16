@@ -124,6 +124,8 @@ REST_FRAMEWORK = {
         'rest_framework_datatables.renderers.DatatablesRenderer',
     ],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S.%f%z", 
+    
 }
 
 TEMPLATES = [

@@ -83,7 +83,7 @@ class CVRP:  # pragma: no cover
             raise CVRPException("could not getoverall_locations latlong")
 
         distance_matrix = [
-            [(int(geodesic(p1, p2).miles)) for p2 in overall_locations]
+            [(int(geodesic(p1, p2).km )) for p2 in overall_locations]
             for p1 in overall_locations
         ]
         if not distance_matrix:
@@ -219,7 +219,9 @@ class CVRP:  # pragma: no cover
                 route_data["duration"] = "not calculated"
 
                 driver_capacity = driver_dict[vehicle_id]["capacity"]
+                route_data["vehicle_capacity"] = driver_capacity
                 vehicle_utilization = int((route_load / driver_capacity) * 100)
+                route_data["vehicle_capacity"] = driver_capacity
 
                 route_data["vehicle_capacity_utilization"] = vehicle_utilization
 
@@ -240,7 +242,7 @@ class CVRP:  # pragma: no cover
             plan_output += "Distance of the route: {}miles -> ".format(route_distance)
 
             plan_output += "Total Load of the route: {}\n".format(route_load)
-            print(plan_output)
+           
 
             routes.append(plan_output)
             operations.append(route_data)
