@@ -239,7 +239,7 @@ def plan_routes(request):
     # print(hubs)
     # print(choices)
 
-    all_drivers = Driver.objects.all().order_by("id")
+    all_drivers = Driver.objects.all().order_by("capacity")
     # start=optimization_settings.start_address
 
     if optimization_settings.selection == "Min_Distance":
