@@ -20,7 +20,7 @@ font-size: 20px;
 line-height: 24px;
 letter-spacing: 0.01em;
 
-color: #000000;">Ongoing Trips</h1>
+color: #000000;">Active Trips  </h1>
 <!-- <div class="form-group has-search pt-3" >
     <input type="text" class="form-control" placeholder="Search">
   </div> -->
@@ -55,7 +55,7 @@ color: #000000;">Ongoing Trips</h1>
         </div>        -->
 
     <div class=" py-3">
-        <button class="btn btn-primary" id="complete-button">Complete</button>
+        <button class="btn btn-primary" id="complete-button">Cancel</button>
 
         <div class="toolbar float-right">
               
@@ -78,7 +78,9 @@ color: #000000;">Ongoing Trips</h1>
                        
 
                        <th>code</th>
-                       <th>driver</th>
+                       <th>departure</th>
+                       <th>driver </th>
+                       <th>vehicle_capacity</th>
                        <th>deliveries</th>
                        
                       
@@ -86,7 +88,7 @@ color: #000000;">Ongoing Trips</h1>
                        
                       
                        <th>load</th>
-                       <th>vehicle_capacity</th>
+                      
                        <th>utilization(%)</th>
                        <th>distance(km)</th>
                        <th>status</th>
@@ -147,7 +149,15 @@ color: #000000;">Ongoing Trips</h1>
                         orderable: true
                     },
                     {
+                        data: 'added',
+                        orderable: true
+                    },
+                    {
                         data: 'driver',
+                        orderable: false
+                    },
+                    {
+                        data: 'driver_capacity',
                         orderable: false
                     },
                     {
@@ -159,10 +169,7 @@ color: #000000;">Ongoing Trips</h1>
                         data: 'load',
                         orderable: false
                     },
-                    {
-                        data: 'driver_capacity',
-                        orderable: false
-                    },
+                    
                     {
                         data: 'utilization',
                         orderable: false
@@ -208,9 +215,10 @@ color: #000000;">Ongoing Trips</h1>
                     success: function (data) {
                         window.location="/api/v1/route_summary"
                     },
-                    error: function (err) {
-                        console.log('error: album artist options:', err);
-                    }
+                    error: function(xhr, status, error) {
+                        var err = eval("(" + xhr.responseText + ")");
+                        alert(err.Message);
+                      },
                 });
             });
         });

@@ -8,9 +8,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from .Router import CVRP
 from .utilization import LoadOptimization
 from django.db.models import Q
+import datetime
 
 
 class RouteSettingsSerializer(serializers.ModelSerializer):
+    # day = serializers.DateField(initial=datetime.date.today)
     # routes_data = serializers.SerializerMethodField()
 
     class Meta:
@@ -23,10 +25,12 @@ class TripSerializer(serializers.ModelSerializer):
     # routes_data = serializers.SerializerMethodField()
     driver_capacity= serializers.SerializerMethodField()
     driver= serializers.SerializerMethodField()
+    # added=serializers.DateTimeField()
+    
 
     class Meta:
         model = Trip
-        fields = [ "id", "code","status", "driver","num_deliveries","load","utilization","distance","driver_capacity","depature_time",]\
+        fields = [ "id","code","added","departure_time", "status", "driver","num_deliveries","load","utilization","distance","driver_capacity",]
             
         
     def get_driver_capacity(self, obj):
@@ -36,7 +40,7 @@ class TripSerializer(serializers.ModelSerializer):
     def get_driver(self, obj):
         """Serializer method to return obj location in lat,long"""
         return obj.driver.name
-        
+    
 
 
 class DeliverySerializer(serializers.ModelSerializer):
@@ -169,8 +173,3 @@ class ContactForm(serializers.Serializer):
 #         }
 
 #         return render(request, 'customer/order_confirmation.html', context)
-# https://avlview.com/schedule-trips/
-# https://en.wikipedia.org/wiki/GPS_tracking_unit
-# https://en.wikipedia.org/wiki/Vehicle_tracking_system
-# https://en.wikipedia.org/wiki/Fleet_management
-# https://avlview.com/fleet-management/

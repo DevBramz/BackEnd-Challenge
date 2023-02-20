@@ -46,7 +46,7 @@ class TripAdmin(OSMGeoAdmin):
         "load",
         "utilization",
         "distance",
-        "depature_time",
+        "departure_time",
 
         
         

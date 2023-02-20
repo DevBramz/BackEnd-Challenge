@@ -50,22 +50,34 @@ border-radius: 6px;">
         </div> 
     https://datatables.net/extensions/select/examples/initialisation/checkbox.html       -->
         <div>
+                
+               
+             
+              
             <div id="div2">Route Summary
             <button class="btn btn-primary" id="dispatch-button">Dispatch</button>
             
         </div>
-        </div>
-        
        
+      
+        
+        <div class="col-sm-9">
+            
+               
+                
+            
         <div id="result" class="hide">
+          <span>Table  View</span>
             <table id="table1">
               <thead>
                 <tr>
                   <th>Route</th>
-                  <th>Driver</th>
                   <th>Deliveries</th>
+                  <th>Driver</th>
+                  <th>Capacity</th>
+                 
                   <th>Load</th>
-                  <th>Vehicle-Capacity</th>
+                 
                   <th>Utilization</th>
                   <th>Distance</th>
                  
@@ -76,7 +88,7 @@ border-radius: 6px;">
             </table>
           </div>
           <div class="toolbar float-left">
-            <button class="btn btn-primary" id="dispatch-button">Back to Settings </button>
+            <button class="btn btn-primary" id="settings-button">Back to Settings </button>
 
               
             </form>
@@ -84,6 +96,7 @@ border-radius: 6px;">
             
           
         </div>
+    </div>
    
         <!-- <div class="table-responsive p-3">
             <table
@@ -124,10 +137,11 @@ border-radius: 6px;">
                 let tr = [];
                 data.forEach(item => {
                       tr.push('<tr><td>' + item.vehicle + '</td>')
-                      tr.push('<td>' + item.driver_name + '</td>')
                       tr.push('<td>' + item.num_deliveries+ '</td>')
-                      tr.push('<td>' + item.load+ '</td>')
+                      tr.push('<td>' + item.driver_name + '</td>')
                       tr.push('<td>' + item.vehicle_capacity+ '</td>')
+                      
+                      tr.push('<td>' + item.load+ '</td>')
                       tr.push('<td>' + item.vehicle_capacity_utilization + '</td>')
                       tr.push('<td>' + item.distance + '</td>')
                       tr.push('<td>' + item.route + '</td>')
@@ -140,9 +154,13 @@ border-radius: 6px;">
             },
             
             
-            error: function (err) {
-                console.log('error: album artist options:', err);
-            }
+            error: function(xhr,status, error) {
+                <!-- var err = eval("(" + xhr.responseText + ")"); -->
+                var err = JSON.parse(xhr.responseText);
+                alert(err.detail);
+                alert(xhr.status);
+                
+              },
         });
         $('#dispatch-button').on('click', function() {
         
@@ -157,9 +175,13 @@ border-radius: 6px;">
                 success: function (data) {
                     window.location="/api/v1/trips"
                 },
-                error: function (err) {
-                    console.log('error: album artist options:', err);
-                }
+                error: function(xhr,status, error) {
+                    <!-- var err = eval("(" + xhr.responseText + ")"); -->
+                    var err = JSON.parse(xhr.responseText);
+                    alert(err.message);
+                    alert(xhr.status);
+                    
+                  },
             });
         });
       

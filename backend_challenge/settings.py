@@ -124,7 +124,7 @@ REST_FRAMEWORK = {
         'rest_framework_datatables.renderers.DatatablesRenderer',
     ],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
-    'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S.%f%z", 
+    'DATETIME_FORMAT': "%Y-%m-%d %H:%M", 
     
 }
 
@@ -177,6 +177,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
 LANGUAGE_CODE = "en-us"
+DATETIME_FORMAT = '%d-%m-%Y %H:%M:%S'
 
 TIME_ZONE = "Africa/Nairobi"
 
@@ -221,7 +222,7 @@ OIDC_OP_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
 OIDC_OP_USER_ENDPOINT = "https://openidconnect.googleapis.com/v1/userinfo"
 OIDC_RP_CLIENT_ID = config("OIDC_RP_CLIENT_ID")
 OIDC_RP_CLIENT_SECRET = config("OIDC_RP_CLIENT_SECRET")
-CELERY_BROKER_URL = config("REDIS_URL")
+CELERY_BROKER_URL ='redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"

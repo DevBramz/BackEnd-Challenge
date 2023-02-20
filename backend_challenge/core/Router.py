@@ -23,7 +23,7 @@ class CVRP:  # pragma: no cover
     api_key = "AIzaSyBxI_rtVjyCashC_RtMxOuZnrRorwKc34M"
 
     gmaps = googlemaps.Client(key=api_key)
-    
+
     # gmaps = googlemaps.Client(key="WWWWW")
 
     # This computes the distance matrix by using GOOGLE MATRIX API
@@ -38,15 +38,15 @@ class CVRP:  # pragma: no cover
 
     drivers = []
     deliveries = []
-    start_adress = None
-    end_adress = None
+    optimization_settings = None
     capacity = 0
 
-    def __init__(self, drivers, deliveries, start):
+    def __init__(self, drivers, deliveries, optimization_settings):
         self._drivers = drivers
 
         self._deliveries = deliveries
-        self._start_adress = start
+        self.optimization_settings = optimization_settings
+        # self.end_adress = optimization_settings.end_adress
 
     # @property
     # def drivers(self):
@@ -62,7 +62,7 @@ class CVRP:  # pragma: no cover
         teamhub_dict_adress = {
             "code": "depot",
             "adress_name": "Kilimani",  # fetch adress from team hub, hardcorded for demo #integration
-            "latlong": self._start_adress,
+            "latlong": self.optimization_settings.start_address,
         }  # fetch adress from team hub
 
         if not teamhub_dict_adress:
@@ -83,11 +83,16 @@ class CVRP:  # pragma: no cover
             raise CVRPException("could not getoverall_locations latlong")
 
         distance_matrix = [
-            [(int(geodesic(p1, p2).km )) for p2 in overall_locations]
+            [(int(geodesic(p1, p2).km)) for p2 in overall_locations]
             for p1 in overall_locations
         ]
+        # time_matrix = [
+        #     [(int(geodesic(p1, p2).km/40)) for p2 in overall_locations]
+        #     for p1 in overall_locations
+        # ]
+        # print(time_matrix)
         if not distance_matrix:
-            raise CVRPException("could not calculate matriz")
+            raise CVRPException("could not calculate matrix")
         return distance_matrix
 
     @property
@@ -161,7 +166,6 @@ class CVRP:  # pragma: no cover
         data = {}
         data["distance_matrix"] = self.compute_geodisic_distance_matrix
 
-
         data["demands"] = [0] + list(self._deliveries.values_list("weight", flat=True))
         # the quantity of the delivery in each delivery adress
 
@@ -175,7 +179,7 @@ class CVRP:  # pragma: no cover
         data["depot"] = 0
         return data
 
-    def routing_solution(self,  data, manager, routing, solution):
+    def routing_solution(self, data, manager, routing, solution):
         """returns rouing soluting"""
 
         total_distance = 0
@@ -188,8 +192,8 @@ class CVRP:  # pragma: no cover
             route_data = {}
 
             index = routing.Start(vehicle_id)
-            summary_id = vehicle_id + 1
-            plan_output = "Route {}  :".format(summary_id)
+            # summary_id = vehicle_id + 1
+            # plan_output = "Route {}  :".format(summary_id)
             route_distance = 0
             route_load = 0
             route_id = vehicle_id + 1
@@ -200,10 +204,11 @@ class CVRP:  # pragma: no cover
             while not routing.IsEnd(index):
 
                 node_index = manager.IndexToNode(index)
-                place=locations[node_index]["adress_name"]
+                # place = locations[node_index]["adress_name"]
+
                 route_load += data["demands"][node_index]
                 # plan_output += " {0}  Load ({1}) -> ".format(place, route_load)
-                plan_output += " {0}   -> ".format(place)
+                # plan_output += " {0}   -> ".format(place)
                 previous_index = index
                 index = solution.Value(routing.NextVar(index))
                 route_distance += routing.GetArcCostForVehicle(
@@ -234,17 +239,13 @@ class CVRP:  # pragma: no cover
 
             path_cordinates = [locations[i]["latlong"] for i in path]
             encoded_polyline = polyline.encode(path_cordinates, 5)
+            # print(type(encoded_polyline))
             route_data["num_deliveries"] = len(deliveries)
             route_data["deliveries"] = deliveries
             route_data["route"] = path_adresses
             route_data["encoded_polyline"] = encoded_polyline
 
-            plan_output += "Distance of the route: {}miles -> ".format(route_distance)
-
-            plan_output += "Total Load of the route: {}\n".format(route_load)
-           
-
-            routes.append(plan_output)
+            # routes.append(plan_output)
             operations.append(route_data)
 
             for route_data in operations[:]:
@@ -256,13 +257,10 @@ class CVRP:  # pragma: no cover
             total_load += route_load
 
             payload = {
-                "total_distance": total_distance,
-                "total_load": total_load,
                 "num_vehicles_used": len(operations),
                 "summary": routes,
                 "routes": operations,
             }
-           
 
         return payload
 
@@ -312,7 +310,7 @@ class CVRP:  # pragma: no cover
         routing.AddDimension(
             transit_callback_index,
             0,  # no slack
-            30000000,  # vehicle maximum travel distance calculate from route settings
+            300000000,  # vehicle maximum travel distance calculate from route settings
             True,  # start cumul to zero
             dimension_name,
         )

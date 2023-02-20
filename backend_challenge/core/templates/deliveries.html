@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Deliveries{% endblock %}
+{% block title %}Orders{% endblock %}
 {% block content %}
 
  <div class="container">
@@ -10,7 +10,7 @@
     line-height: 24px;
     letter-spacing: 0.01em;
     
-    color: #000000;">Pending  Deliveries</h1>
+    color: #000000;">Orders</h1>
 <div class="card shadow "style="box-sizing: border-box;
 
 
@@ -56,7 +56,32 @@ border-radius: 6px;">
         </div>        -->
 
     <div class=" py-3">
-        <button class="btn btn-primary" id="optimize-button">Optimize</button>
+        <button class="btn btn-primary" id="optimize-button">Optimize  </button>
+
+        <div class="toolbar float-right">
+              
+            </form>
+            
+            
+          
+        </div>
+    </div>
+
+    <div class=" py-3">
+        <button class="btn btn-primary" id="optidispatch-button">Optimize and Dispatch  </button>
+
+        <div class="toolbar float-right">
+              
+            </form>
+            
+            
+          
+        </div>
+    </div>
+
+
+    <div class="d-flex align-items-center justify-content-between px-3" style=" margin-left:450px;"">
+        <button class="btn btn-primary" id="imp;ort-button">Import Orders</button>
 
         <div class="toolbar float-right">
               
@@ -88,6 +113,11 @@ border-radius: 6px;">
             </table>
         </div>
         <div class="card-body p-0">
+
+
+
+
+            
             <!-- Billing history table-->
             
         </div>
@@ -117,14 +147,10 @@ border-radius: 6px;">
               }
             const csrftoken = getCookie('csrftoken');
             var table = $('#deliveries-list').DataTable({
-                fixedColumns:   {
-                    left: 2
-                },
                 columnDefs: [ {
                     orderable: false,
                     
                     'targets': 0,
-                    className: 'select-checkbox',
                     
                     
                 } ],
@@ -142,23 +168,28 @@ border-radius: 6px;">
                 columns: [
                     {
                         data: 'code',
-                        orderable: true
+                        orderable: true,
+                        searchable:true,
                     },
                     {
                         data: 'phone',
-                        orderable: true
+                        orderable: true,
+                        searchable:true,
                     },
                     {
                         data: 'weight',
-                        orderable: false
+                        orderable: false,
+                        searchable:true
                     },
                     {
                         data: 'address',
-                        orderable: false
+                        orderable: false,
+                        searchable:true,
                     },
                     {
                         data: 'status',
-                        orderable: false
+                        orderable: false,
+                        searchable:true,
                     }
 
 
@@ -195,11 +226,47 @@ border-radius: 6px;">
                         window.location="/api/v1/settings"
                     },
                     error: function (err) {
-                        console.log('error: album artist options:', err);
+                        throw new Error('Parameter is not a number!');
                     }
                 });
             });
+            $('#optidispatch-button').on('click', function() {
+                var selected = [];
+                
+               // prevent the page from reload
+               
+                
+                var data = table.rows('.selected').data();
+                console.log(data);
+                data.each(function (value, index) {
+                    console.log(`For index ${index}, data value is ${value.code}`);
+                    selected.push(value.code);
+        
+                
+                });
+                var total=selected.length
+                alert(` ${total} deliveries selected`);
+                $.ajax({
+                    type: "POST",
+                    url: "/api/v1/delivery/get_selected/",
+                    data:{
+                       ids: JSON.stringify(selected),
+                       csrfmiddlewaretoken: csrftoken
+                       
+                       
+                    },
+                    success: function (data) {
+                        window.location="/api/v1/optimize-dispatch"
+                    },
+                    error: function(xhr, status, error) {
+                        var err = eval("(" + xhr.responseText + ")");
+                        alert(err.Message);
+                      }
+                });
+            });
         });
+
+        
     </script>
 {% endblock %}
 

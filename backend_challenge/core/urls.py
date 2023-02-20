@@ -15,6 +15,7 @@ from .views import (
     dispatch_routes,
     plan_routes,
     view_route_summary,
+    optimize_dispatch
     
    
 )
@@ -47,7 +48,8 @@ urlpatterns = [
     path("dispatch", dispatch_routes),
     path('delis', views.index, name='delis'),
    
-    path('route_summary',view_route_summary , name='route_summary')
+    path('route_summary',view_route_summary , name='route_summary'),
+    path('optimize-dispatch',optimize_dispatch , name='optimize_dispatch')
     # path('update/<int:todoId>/', views.update_settings, name='settings')
    
     # path("customer", views.Customer_Create.as_view(), name="customer"),

@@ -11,8 +11,7 @@ from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 import datetime
-
-from backend_challenge.core.tasks import send_sms_driver
+# from .tasks import send_sms_driver
 
 
 def generate_secret():
@@ -25,13 +24,23 @@ def generate_secret():
     full_code = initial + code
     return full_code.upper()
 
+def get_organization_hubs():
+    
+    org=Organization.objects.get(org__name="ibuQA")
+    hubs=org.hubs.all()
+    choices=[(o.name, str(o)) for o in hubs]
+    print(hubs)
+    print((choices))
+    return choices
+
+
 
     
     
 
 def generate_trip_secret():
 
-    initial = "TRI"
+    initial = "SHI"
     code = get_random_string(
         length=6, allowed_chars=string.ascii_lowercase + string.digits
     )
@@ -160,8 +169,8 @@ class Organization(TimeStampedModel):
     
 class Hub(TimeStampedModel):
     """
-    Stores information about a specific depot inside a :model:`organization.Organization`
-    Depots are commonly known as terminals,hub.
+    Stores information about a specific hub inside a :model:`organization.Organization`
+    Hubs are commonly known as terminals,hub.
     """
 
     id = models.UUIDField(
@@ -173,75 +182,74 @@ class Hub(TimeStampedModel):
     organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE,
-        related_name="depots",
-        related_query_name="depot",
+        related_name="hubs",
         verbose_name=_("Organization"),
-        help_text=_("The organization that the depot belongs to."),
+        help_text=_("The organization that the hub belongs to."),
     )
     name = models.CharField(
-        _("Depot Name"),
+        _("Hub Name"),
         max_length=255,
         unique=True,
-        help_text=_("The name of the depot."),
+        help_text=_("The name of the hub."),
     )
     description = models.TextField(
-        _("Depot Description"),
+        _("Hub Description"),
         max_length=255,
-        help_text=_("The description of the depot."),
+        help_text=_("The description of the hub."),
         blank=True,
     )
     address_line_1 = models.CharField(
         _("Address Line 1"),
         max_length=255,
-        help_text=_("The address line 1 of the depot."),
+        help_text=_("The address line 1 of the hub."),
     )
     address_line_2 = models.CharField(
         _("Address Line 2"),
         max_length=255,
-        help_text=_("The address line 2 of the depot."),
+        help_text=_("The address line 2 of the hub."),
         blank=True,
     )
-    cordinates = models.PointField(default=Point(36.798107, -1.283922))
+    location_cordinates= models.PointField(blank=True, default=Point(36.798107, -1.283922))
     city = models.CharField(
         _("City"),
         max_length=255,
-        help_text=_("The city of the depot."),
+        help_text=_("The city of the hub."),
     )
     # state = USStateField(
     #     _("State"),
     #     blank=True,
     #     null=True,
-    #     help_text=_("The state of the depot."),
+    #     help_text=_("The state of the hub."),
     # )
     # zip_code = USZipCodeField(
     #     _("Zip Code"),
     #     blank=True,
     #     null=True,
-    #     help_text=_("The zip code of the depot."),
+    #     help_text=_("The zip code of the hub."),
     # )
     # phone_number = PhoneNumberField(
     #     _("Phone Number"),
     #     blank=True,
     #     null=True,
-    #     help_text=_("The phone number of the depot."),
+    #     help_text=_("The phone number of the hub."),
     # )
     # alternate_phone_number = PhoneNumberField(
     #     _("Alternate Phone Number"),
     #     blank=True,
     #     null=True,
-    #     help_text=_("The alternate phone number of the depot."),
+    #     help_text=_("The alternate phone number of the hub."),
     # )
     # fax_number = PhoneNumberField(
     #     _("Fax Number"),
     #     blank=True,
     #     null=True,
-    #     help_text=_("The fax number of the depot."),
+    #     help_text=_("The fax number of the hub."),
     # )
 
 
     class Meta:
         """
-        Metaclass for the Depot model
+        Metaclass for the Hub model
         """
 
         verbose_name = _("Hub")
@@ -269,7 +277,7 @@ class Driver(TimeStampedModel):
     national_id = models.PositiveIntegerField(db_index=True, unique=True)
     name = models.CharField("name", max_length=20)
     capacity = models.PositiveIntegerField(null=True)
-    availability_status = models.BooleanField(default=False)
+    availability_status = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -304,6 +312,7 @@ class RouteSettings(TimeStampedModel):
 
         
         Manual = "MU", _("Manual Vehicle Selection")
+    
 
     # class Mode(models.TextChoices):
     #     Distance = "Min_Distance", _("Minimize Distance")
@@ -350,7 +359,7 @@ class RouteSettings(TimeStampedModel):
     departure_time = models.TimeField(blank=True, null=True)  # set departure tim
     finish_time = models.TimeField(blank=True, null=True)
     org=models.ForeignKey('Organization',null=True, on_delete=models.CASCADE)
-    # service_time=models.DurationField(blank=True, null=True)
+    service_time=models.DurationField(blank=True, null=True)
 
     class Meta:
         verbose_name = _("RouteSettings")
@@ -491,7 +500,7 @@ class Trip(TimeStampedModel):
         "Driver", related_name="driver_trips", null=True, on_delete=models.CASCADE
     )
     num_deliveries= models.CharField(max_length=100, blank=True,default=1,editable=False)
-    depature_time = models.DateTimeField( blank=True, null=True)
+    departure_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     duration=models.DurationField(blank=True, null=True)
     fuel_consumption=models.PositiveIntegerField(blank=True, null=True)
     estimated_completion_time=models.DateTimeField(blank=True, null=True)
@@ -563,16 +572,16 @@ class Trip(TimeStampedModel):
         # we omit storing the driver on the model for simplicity of the example
         message = f"Dear {self.driver.name}, you have ben assigned trip {self.code} with {self.num_deliveries} deliveries  ."
         self._transition(STATUS_DISPATCHED)
-        # driver_phone = self.driver.phone
-        # send_sms_driver(message,driver_phone)
+        driver_phone = self.driver.phone
+        # send_sms_driver.delay(message,driver_phone)
         
-    def change_to_in_transit(self):
-        # we omit storing the driver on the model for simplicity of the example
+    # def change_to_in_transit(self):
+    #     # we omit storing the driver on the model for simplicity of the example
       
          
-        self._transition(STATUS_DISPATCHED)
-        message = f"Dear {self.driver.name}, you have ben assigned trip {self.code} with {self.num_deliveries} deliveries "
-        phone=self.driver.phone
+    #     self._transition(STATUS_DISPATCHED)
+    #     message = f"Dear {self.driver.name}, you have ben assigned trip {self.code} with {self.num_deliveries} deliveries "
+    #     phone=self.driver.phone
        
        
         
@@ -589,17 +598,4 @@ class Trip(TimeStampedModel):
     def __str__(self):
         return str(self.code)
 
-    # Routes are created which minimize the total number of miles driven by your workers.
-    # This will reduce the overall cost to complete the route,
-    # however, it allows for violations in your Complete Before and Complete After windows.
-    # however, it allows for violations in your Complete Before and Complete After windows.
-    # however, it allows for violations in your Complete Before and Complete After windows.
-    # however, it allows for violations in your Complete Before and Complete After windows.
-    #  https://stackoverflow.com/questions/36500331/putting-latitudes-and-longitudes-into-a-distance-matrix-google-map-api-in-pytho
-    # https://gist.github.com/Kevin-De-Koninck/bafceafe1ed16784962a689b3a90f0c4
-
-
-#     To avoid any issue with rounding, you can scale the distance matrix: multiply all entries of the matrix by a large number — say 100. This multiplies the length of any route by a factor of 100, but it doesn't change the solution. The advantage is that now when you round the matrix entries, the rounding amount (which is at most 0.5), is very small compared to the distances, so it won't affect the solution significantly.
-
-# If you scale the distance matrix, you also need to change the solution printer to divide the scaled route lengths by the scaling factor, so that it displays the unscaled distances of the routes.
-# Maximum tasks per driver.https://www.traccar.org/
+   

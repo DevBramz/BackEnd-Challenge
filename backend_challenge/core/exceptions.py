@@ -43,6 +43,8 @@ class SmsException(Exception):
 
     def __init__(self, msg) -> None:
         self.message = msg
+
+
 class CVRPException(Exception):
     """Exception raised SMS encounters an error"""
 
@@ -55,4 +57,8 @@ class CVRPException(Exception):
 class RoutingException(APIException):
     status_code = 400
     default_detail = 'Route Optimization Failed,This could be as a result of your total weight of deliveries exceeding the total vehicle capacity"'
+    default_code = "service_unavailable"
+class DispatchException(APIException):
+    status_code = 400
+    default_detail = 'Selected Deliveries were not found,Make sure to select deliveries before planning routes'
     default_code = "service_unavailable"
