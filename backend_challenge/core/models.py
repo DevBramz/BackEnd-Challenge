@@ -11,12 +11,11 @@ from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 import datetime
-# from .tasks import send_sms_driver
 
 
 def generate_secret():
 
-    initial = "IBU-DEL"
+    initial = "DEL"
     code = get_random_string(
         length=6, allowed_chars=string.ascii_lowercase + string.digits
     )
@@ -569,11 +568,13 @@ class Trip(TimeStampedModel):
         self.save()
 
     def dispatch(self):
+        from .tasks import send_sms_driver
+
         # we omit storing the driver on the model for simplicity of the example
         message = f"Dear {self.driver.name}, you have ben assigned trip {self.code} with {self.num_deliveries} deliveries  ."
         self._transition(STATUS_DISPATCHED)
         driver_phone = self.driver.phone
-        # send_sms_driver.delay(message,driver_phone)
+        send_sms_driver.delay(message,driver_phone)
         
     # def change_to_in_transit(self):
     #     # we omit storing the driver on the model for simplicity of the example

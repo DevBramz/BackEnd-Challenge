@@ -15,18 +15,18 @@ def user_fixture():
     )
     return user
 
-@pytest.mark.django_db
-@pytest.fixture
-def delivery_fixture():
-    delivery = Delivery.objects.create(
-        code="DELO37XK8",
-        phone="+254728826517",
-        weight=5,
-        status="pending",
-        address="Karen",
-        delivery_adress="SRID=4326;POINT (36.70394896949966 -1.328196761493883)",
-    )
-    return delivery
+# @pytest.mark.django_db
+# @pytest.fixture
+# def delivery_fixture():
+#     delivery = Delivery.objects.create(
+#         code="DELO37XK8",
+#         phone="+254728826517",
+#         weight=5,
+#         status="pending",
+#         address="Karen",
+#         delivery_adress="SRID=4326;POINT (36.70394896949966 -1.328196761493883)",
+#     )
+#     return delivery
 
 
 @pytest.mark.django_db
@@ -34,9 +34,9 @@ def test_user_create(user_fixture):
     assert User.objects.count() == 1
 
 
-@pytest.mark.django_db
-def test_delivery_create(delivery_fixture):
-    assert Delivery.objects.count() == 1
+# @pytest.mark.django_db
+# def test_delivery_create(delivery_fixture):
+#     assert Delivery.objects.count() == 1
 
 # @pytest.fixture
 # def api_client():

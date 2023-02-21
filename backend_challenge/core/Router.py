@@ -19,7 +19,7 @@ from backend_challenge.core.exceptions import (
 )
 
 
-class CVRP:  # pragma: no cover
+class CVRP: 
     api_key = "AIzaSyBxI_rtVjyCashC_RtMxOuZnrRorwKc34M"
 
     gmaps = googlemaps.Client(key=api_key)

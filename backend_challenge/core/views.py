@@ -238,7 +238,6 @@ def plan_routes(request):
     # choices=[(o.name, str(o)) for o in hubs]
     # print(hubs)
     # print(choices)
-
     all_drivers = Driver.objects.all().order_by("capacity")
     # start=optimization_settings.start_address
 
@@ -322,7 +321,7 @@ def optimize_dispatch(request):
 
     deliveries = get_selected_deliveries_in_session(request)
     if not deliveries:
-        raise CVRPException("Selected deliveries not found")
+        raise  DispatchException
 
     # choices=[(o.code, str(o.code)) for o in deliveries]
 
@@ -412,7 +411,10 @@ class SettingsDetail(APIView):
         if not serializer.is_valid():
             return Response({"serializer": serializer, "settings": settings})
         serializer.save()
-        return redirect("/api/v1/route_summary")
+        deliveries = get_selected_deliveries_in_session(request)
+        if deliveries:
+            return redirect("/api/v1/route_summary")
+        raise  DispatchException
 
 
 #  def post(self, request, *args, **kwargs):

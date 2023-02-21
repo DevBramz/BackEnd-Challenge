@@ -22,7 +22,7 @@ omit =
 
 
 [report]
-#fail_under = 100
+fail_under = 100
 show_missing = True
 #skip_covered = True
 exclude_lines =p
