@@ -1,15 +1,18 @@
 from django.contrib import admin
 from django.contrib.gis.admin import OSMGeoAdmin
 
-from .models import Delivery, Driver, RouteSettings, Trip,Vehicle,Organization,Hub
+from .models import Delivery, Driver, RouteSettings, Trip,Vehicle,Organization,Employee
 
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     pass
-@admin.register(Hub)
-class HubAdmin(admin.ModelAdmin):
+@admin.register(Employee)
+class EmployeeAdmin(admin.ModelAdmin):
     pass
+# @admin.register(Hub)
+# class HubAdmin(admin.ModelAdmin):
+#     pass
 
 
 

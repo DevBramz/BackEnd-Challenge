@@ -2,14 +2,21 @@ import string
 import uuid
 import textwrap
 from django.contrib.auth.models import User
+from django.contrib.gis.db import models
 from django.core.validators import RegexValidator
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.utils.crypto import get_random_string
-from django.contrib.gis.db import models
+
 from django.contrib.gis.geos import Point
+from django.contrib.gis.db.models import PointField
+
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.contrib.auth.models import Group
+
+
 import datetime
 
 
@@ -59,7 +66,8 @@ def set_trip_code() -> str:
             if Trip.objects.filter(code=code).exists()
             else code
         )
-
+class Employee(models.Model):
+    employee_title = models.ManyToManyField(Group)
 
 class TimeStampedModel(models.Model):
     added = models.DateTimeField(auto_now_add=True)
@@ -166,54 +174,54 @@ class Organization(TimeStampedModel):
         """
         return textwrap.wrap(self.name, 50)[0]
     
-class Hub(TimeStampedModel):
-    """
-    Stores information about a specific hub inside a :model:`organization.Organization`
-    Hubs are commonly known as terminals,hub.
-    """
+# class Hub(TimeStampedModel):
+#     """
+#     Stores information about a specific hub inside a :model:`organization.Organization`
+#     Hubs are commonly known as terminals,hub.
+#     """
 
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-        unique=True,
-    )
-    organization = models.ForeignKey(
-        Organization,
-        on_delete=models.CASCADE,
-        related_name="hubs",
-        verbose_name=_("Organization"),
-        help_text=_("The organization that the hub belongs to."),
-    )
-    name = models.CharField(
-        _("Hub Name"),
-        max_length=255,
-        unique=True,
-        help_text=_("The name of the hub."),
-    )
-    description = models.TextField(
-        _("Hub Description"),
-        max_length=255,
-        help_text=_("The description of the hub."),
-        blank=True,
-    )
-    address_line_1 = models.CharField(
-        _("Address Line 1"),
-        max_length=255,
-        help_text=_("The address line 1 of the hub."),
-    )
-    address_line_2 = models.CharField(
-        _("Address Line 2"),
-        max_length=255,
-        help_text=_("The address line 2 of the hub."),
-        blank=True,
-    )
-    location_cordinates= models.PointField(blank=True, default=Point(36.798107, -1.283922))
-    city = models.CharField(
-        _("City"),
-        max_length=255,
-        help_text=_("The city of the hub."),
-    )
+#     id = models.UUIDField(
+#         primary_key=True,
+#         default=uuid.uuid4,
+#         editable=False,
+#         unique=True,
+#     )
+#     organization = models.ForeignKey(
+#         Organization,
+#         on_delete=models.CASCADE,
+#         related_name="hubs",
+#         verbose_name=_("Organization"),
+#         help_text=_("The organization that the hub belongs to."),
+#     )
+#     name = models.CharField(
+#         _("Hub Name"),
+#         max_length=255,
+#         unique=True,
+#         help_text=_("The name of the hub."),
+#     )
+#     description = models.TextField(
+#         _("Hub Description"),
+#         max_length=255,
+#         help_text=_("The description of the hub."),
+#         blank=True,
+#     )
+#     address_line_1 = models.CharField(
+#         _("Address Line 1"),
+#         max_length=255,
+#         help_text=_("The address line 1 of the hub."),
+#     )
+#     address_line_2 = models.CharField(
+#         _("Address Line 2"),
+#         max_length=255,
+#         help_text=_("The address line 2 of the hub."),
+#         blank=True,
+#     )
+#     location_cordinates= PointField(null=True,blank=True)
+#     city = models.CharField(
+#         _("City"),
+#         max_length=255,
+#         help_text=_("The city of the hub."),
+    
     # state = USStateField(
     #     _("State"),
     #     blank=True,
@@ -246,22 +254,22 @@ class Hub(TimeStampedModel):
     # )
 
 
-    class Meta:
-        """
-        Metaclass for the Hub model
-        """
+    # class Meta:
+    #     """
+    #     Metaclass for the Hub model
+    #     """
 
-        verbose_name = _("Hub")
-        verbose_name_plural = _("Hubs")
-        ordering = ["name"]
+    #     verbose_name = _("Hub")
+    #     verbose_name_plural = _("Hubs")
+    #     ordering = ["name"]
 
-    def __str__(self) -> str:
-        """Hub string representation.
+    # def __str__(self) -> str:
+    #     """Hub string representation.
 
-        Returns:
-            str: String representation of the HUB.
-        """
-        return textwrap.wrap(self.name, 50)[0]
+    #     Returns:
+    #         str: String representation of the HUB.
+    #     """
+    #     return textwrap.wrap(self.name, 50)[0]
 
 class Driver(TimeStampedModel):
     phone = models.CharField(
@@ -353,8 +361,8 @@ class RouteSettings(TimeStampedModel):
         default=BranchChoices.Kilimani,
         verbose_name="End Location",
     )
-    start_address = models.PointField()
-    end_address = models.PointField()
+    start_address = PointField()
+    end_address = PointField()
     departure_time = models.TimeField(blank=True, null=True)  # set departure tim
     finish_time = models.TimeField(blank=True, null=True)
     org=models.ForeignKey('Organization',null=True, on_delete=models.CASCADE)
@@ -394,7 +402,7 @@ class Delivery(TimeStampedModel):
         (STATUS_ASSIGNED, _("assigned")),
     )
     code = models.CharField(max_length=100, blank=True)
-    delivery_adress = models.PointField()
+    delivery_adress = PointField()
     address = models.CharField(max_length=100, blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
     phone = models.CharField(
