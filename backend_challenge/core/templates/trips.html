@@ -67,6 +67,25 @@ color: #000000;"> Trips  </h1>
     </div>
     
    
+        <label>Show <select name="status" id="id_status">
+            <option value="" selected="">-----</option>
+          
+            <option value="draft">draft</option>
+          
+            <option value="pending">pending</option>
+          
+            <option value="dispatched">dispatched</option>
+          
+            <option value="ongoing">ongoing</option>
+          
+            <option value="completed">completed</option>
+          
+          </select> entries</label>
+            
+            
+ 
+    
+   
         <div class="table-responsive p-3">
             <table
                 id="trip-list"
@@ -141,7 +160,15 @@ color: #000000;"> Trips  </h1>
                 
                 'ajax': {
                     url: data_url,
-                    dataSrc: 'data'
+                    data: function(data) {
+                        /*
+                        allows the additional data to evaluated and added to the request at the time
+                        the request is made.
+                        The data table will send api with a  request 'search' as a request parameter
+                        when the search input is fired
+                        */
+                        data.status = $("#id_status").val(); // search input value
+                    },
                 },
                 columns: [
                     {
@@ -187,6 +214,13 @@ color: #000000;"> Trips  </h1>
 
 
                 ]
+            });
+
+            $('#id_status').on('change paste keyup', function() {
+               
+
+                table.ajax.reload();
+    
             });
 
             $('#optimize-button').on('click', function() {
