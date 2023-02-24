@@ -91,14 +91,6 @@ class Organization(TimeStampedModel):
         BROKERAGE = "Brokerage", _("Brokerage")
         BOTH = "Both", _("Both")
 
-    # @final
-    # class LanguageChoices(models.TextChoices):
-    #     """
-    #     Supported Language Choices for Monta
-    #     """
-
-    #     ENGLISH = "en", _("English")
-    #     SPANISH = "es", _("Spanish")
 
     id = models.UUIDField(
         primary_key=True,
@@ -110,11 +102,7 @@ class Organization(TimeStampedModel):
         _("Organization Name"),
         max_length=255,
     )
-    scac_code = models.CharField(
-        max_length=4,
-        verbose_name=_("SCAC Code"),
-        help_text=_("The SCAC code for the organization."),
-    )
+   
     org_type = models.CharField(
         max_length=10,
         choices=OrganizationTypes.choices,
@@ -122,19 +110,7 @@ class Organization(TimeStampedModel):
         verbose_name=_("Organization Type"),
         help_text=_("The type of organization."),
     )
-    # timezone = models.CharField(
-    #     _("Timezone"),
-    #     max_length=255,
-    #     default="America/New_York",
-    #     help_text=_("The timezone of the organization"),
-    #     validators=[validate_org_timezone],
-    # )
-    # language = models.CharField(
-    #     _("Language"),
-    #     max_length=2,
-    #     choices=LanguageChoices.choices,
-    #     default=LanguageChoices.ENGLISH,
-    #     help_text=_("The language of the organization"),
+
     # )
     currency = models.CharField(
         _("Currency"),
@@ -142,17 +118,6 @@ class Organization(TimeStampedModel):
         default="USD",
         help_text=_("The currency that the organization uses"),
     )
-    # date_format = models.CharField(
-    #     _("Date Format"),
-    #     max_length=255,
-    #     default="MM/DD/YYYY",
-    #     help_text=_("Date Format"),
-    # )
-    # time_format = models.CharField(
-    #     _("Time Format"),
-    #     max_length=255,
-    #     default="HH:mm",
-    #     help_text=_("Time Format"),
     # )
     # logo = models.ImageField(
     #     _("Logo"), upload_to="organizations/logo/", null=True, blank=True
@@ -174,102 +139,7 @@ class Organization(TimeStampedModel):
         """
         return textwrap.wrap(self.name, 50)[0]
     
-# class Hub(TimeStampedModel):
-#     """
-#     Stores information about a specific hub inside a :model:`organization.Organization`
-#     Hubs are commonly known as terminals,hub.
-#     """
 
-#     id = models.UUIDField(
-#         primary_key=True,
-#         default=uuid.uuid4,
-#         editable=False,
-#         unique=True,
-#     )
-#     organization = models.ForeignKey(
-#         Organization,
-#         on_delete=models.CASCADE,
-#         related_name="hubs",
-#         verbose_name=_("Organization"),
-#         help_text=_("The organization that the hub belongs to."),
-#     )
-#     name = models.CharField(
-#         _("Hub Name"),
-#         max_length=255,
-#         unique=True,
-#         help_text=_("The name of the hub."),
-#     )
-#     description = models.TextField(
-#         _("Hub Description"),
-#         max_length=255,
-#         help_text=_("The description of the hub."),
-#         blank=True,
-#     )
-#     address_line_1 = models.CharField(
-#         _("Address Line 1"),
-#         max_length=255,
-#         help_text=_("The address line 1 of the hub."),
-#     )
-#     address_line_2 = models.CharField(
-#         _("Address Line 2"),
-#         max_length=255,
-#         help_text=_("The address line 2 of the hub."),
-#         blank=True,
-#     )
-#     location_cordinates= PointField(null=True,blank=True)
-#     city = models.CharField(
-#         _("City"),
-#         max_length=255,
-#         help_text=_("The city of the hub."),
-    
-    # state = USStateField(
-    #     _("State"),
-    #     blank=True,
-    #     null=True,
-    #     help_text=_("The state of the hub."),
-    # )
-    # zip_code = USZipCodeField(
-    #     _("Zip Code"),
-    #     blank=True,
-    #     null=True,
-    #     help_text=_("The zip code of the hub."),
-    # )
-    # phone_number = PhoneNumberField(
-    #     _("Phone Number"),
-    #     blank=True,
-    #     null=True,
-    #     help_text=_("The phone number of the hub."),
-    # )
-    # alternate_phone_number = PhoneNumberField(
-    #     _("Alternate Phone Number"),
-    #     blank=True,
-    #     null=True,
-    #     help_text=_("The alternate phone number of the hub."),
-    # )
-    # fax_number = PhoneNumberField(
-    #     _("Fax Number"),
-    #     blank=True,
-    #     null=True,
-    #     help_text=_("The fax number of the hub."),
-    # )
-
-
-    # class Meta:
-    #     """
-    #     Metaclass for the Hub model
-    #     """
-
-    #     verbose_name = _("Hub")
-    #     verbose_name_plural = _("Hubs")
-    #     ordering = ["name"]
-
-    # def __str__(self) -> str:
-    #     """Hub string representation.
-
-    #     Returns:
-    #         str: String representation of the HUB.
-    #     """
-    #     return textwrap.wrap(self.name, 50)[0]
 
 class Driver(TimeStampedModel):
     phone = models.CharField(
@@ -333,8 +203,7 @@ class RouteSettings(TimeStampedModel):
 
         ibuQA = "Rongai  ", _(
             "Rongai hub )"
-        )  # Focuses more on capacity utilization,uses fewest vehicles which might travel longer distance
-
+        )  # Hardcorded choices for now
        
 
     selection = models.CharField(
@@ -344,11 +213,7 @@ class RouteSettings(TimeStampedModel):
         verbose_name="Vehicle Selection",
     )
 
-    # num_vehicles = models.PositiveIntegerField(
-    #     default=6,
-    # )
-    # 
-    # max_load_time=models.DurationField(blank=True, null=True)
+   
     start_location=models.CharField(
         max_length=255,
         choices=BranchChoices.choices,

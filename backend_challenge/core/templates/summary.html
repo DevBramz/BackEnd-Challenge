@@ -60,8 +60,9 @@ border-radius: 6px;">
         </div>
        
       
-        
-        <div class="col-sm-9">
+        <div class="row">
+            <div class="col-6">
+            
             
                
                 
@@ -78,8 +79,8 @@ border-radius: 6px;">
                  
                   <th>Load</th>
                  
-                  <th>Utilization</th>
-                  <th>Distance</th>
+                  <th>Usage</th>
+                  <th>Mileage</th>
                  
                   <th>Path</th>
                 </tr>
@@ -94,9 +95,12 @@ border-radius: 6px;">
             </form>
             
             
-          
+           
         </div>
+        
     </div>
+    <div class="col-6">
+          </div>
    
         <!-- <div class="table-responsive p-3">
             <table
@@ -132,7 +136,7 @@ border-radius: 6px;">
             success: function (data) {
                 $.each(data, function (index, value) {
                     console.log(value)
-                    $("#div3").append('Route'+ value['vehicle']+'  '+' ' + 'Driver:' + value['driver_name'] + ' ' + 'Deliveries:' + value['num_deliveries']+' '+'Utilization:' + value['vehicle_capacity_utilization']+ 'Route:' + value['route']);
+                    $("#div3").append('Route'+ value['vehicle']+'  '+' ' + 'Driver:' + value['driver_name'] + ' ' + 'Deliveries:' + value['num_deliveries']+' '+'Utilisation:' + value['vehicle_capacity_utilization']+ 'Route:' + value['route']);
                 const tb = document.getElementById("tb");
                 let tr = [];
                 data.forEach(item => {
@@ -142,7 +146,7 @@ border-radius: 6px;">
                       tr.push('<td>' + item.vehicle_capacity+ '</td>')
                       
                       tr.push('<td>' + item.load+ '</td>')
-                      tr.push('<td>' + item.vehicle_capacity_utilization + '</td>')
+                      tr.push('<td>' + item.vehicle_capacity_utilization  + '%' +  '</td>')
                       tr.push('<td>' + item.distance + '</td>')
                       tr.push('<td>' + item.route + '</td>')
                     })
