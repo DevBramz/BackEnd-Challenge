@@ -238,7 +238,8 @@ def plan_routes(request):
     # choices=[(o.name, str(o)) for o in hubs]
     # print(hubs)
     # print(choices)
-    all_drivers = Driver.objects.all().order_by("capacity")
+    all_drivers = Driver.objects.all()
+    print(all_drivers)
     # start=optimization_settings.start_address
 
     if optimization_settings.selection == "Min_Distance":
@@ -256,6 +257,7 @@ def plan_routes(request):
         list_of_ids = optimization.main()
 
         drivers = all_drivers.filter(pk__in=list_of_ids)
+        print(drivers)
 
         route = CVRP(drivers, deliveries, optimization_settings)  # Rout
 
@@ -334,7 +336,7 @@ def optimize_dispatch(request):
     # print(hubs)
     # print(choices)
 
-    all_drivers = Driver.objects.all().order_by("id")
+    all_drivers = Driver.objects.all()
     # start=optimization_settings.start_address
 
     if optimization_settings.selection == "Min_Distance":

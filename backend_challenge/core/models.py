@@ -155,7 +155,8 @@ class Driver(TimeStampedModel):
     name = models.CharField("name", max_length=20)
     capacity = models.PositiveIntegerField(null=True)
     availability_status = models.BooleanField(default=True)
-
+    class Meta:
+        ordering = ['added']
     def __str__(self):
         return self.name
 

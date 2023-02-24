@@ -212,8 +212,8 @@ AUTHENTICATION_BACKENDS = (
 LOGIN_REDIRECT_URL = "/api/v1/customer"
 STATIC_URL = "/static/"
 
-CSRF_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SAMESITE = "None"
+# CSRF_COOKIE_SAMESITE = "None"
+# SESSION_COOKIE_SAMESITE = "None"
 OIDC_DRF_AUTH_BACKEND = "mozilla_django_oidc.auth.OIDCAuthenticationBackend"
 OIDC_RP_SIGN_ALGO = "RS256"
 OIDC_OP_JWKS_ENDPOINT = "https://www.googleapis.com/oauth2/v3/certs"
