@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.gis.admin import OSMGeoAdmin
+from leaflet.admin import LeafletGeoAdmin
 
 from .models import Delivery, Driver, RouteSettings, Trip,Vehicle,Organization,Employee
 
@@ -17,7 +18,7 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 
 @admin.register(RouteSettings)
-class RouteSettingsAdmin(OSMGeoAdmin):
+class RouteSettingsAdmin(LeafletGeoAdmin):
     list_display = ("id","selection", "start_address")
 @admin.register(Vehicle)
 class Vehicle(OSMGeoAdmin):
@@ -34,8 +35,9 @@ class DriverAdmin(OSMGeoAdmin):
 
 
 @admin.register(Delivery)
-class DeliveryAdmin(OSMGeoAdmin):
-    list_display = ("id", "code", "address", "weight")
+class DeliveryAdmin(LeafletGeoAdmin):
+    list_display = ("id", "code", "address", "weight",)
+   
 
 
 

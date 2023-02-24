@@ -228,4 +228,21 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "Africa/Nairobi"
 AFRICASTALKING_API_KEY = config("AFRICASTALKING_API_KEY")
+LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': (36.798107,-1.283922), 
+    'DEFAULT_ZOOM': 18, 
+    'MIN_ZOOM': 3,
+    'MAX_ZOOM': 20,
+    'SCALE': 'both',
+    'ATTRIBUTION_PRIFIX': 'tekson', 
+    'RESET_VIEW': False,
+        'TILES': [('OpenStreetMap', 'http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+          'attribution': '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+        }),
+        ('Drak Map', 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            'attribution': '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            'subdomains': 'abcd',
+            'maxZoom': 19
+        })],
+    }
 django_heroku.settings(locals())

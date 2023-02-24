@@ -63,8 +63,9 @@ class CVRP:
             "code": "depot",
             "adress_name": "Kilimani",  # fetch adress from team hub, hardcorded for demo #integration
             "latlong": self.optimization_settings.start_address,
+          
         }  # fetch adress from team hub
-
+        print(self.optimization_settings.start_address)
         if not teamhub_dict_adress:
             raise CVRPException("could not get teamhub adress")
         overall_locations = [teamhub_dict_adress] + [

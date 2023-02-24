@@ -226,8 +226,8 @@ class RouteSettings(TimeStampedModel):
         default=BranchChoices.Kilimani,
         verbose_name="End Location",
     )
-    start_address = PointField()
-    end_address = PointField()
+    start_address = PointField(default=Point(36.7866471,-1.2981014))
+    end_address = PointField(default=Point(36.7866471,-1.2981014))
     departure_time = models.TimeField(blank=True, null=True)  # set departure tim
     finish_time = models.TimeField(blank=True, null=True)
     org=models.ForeignKey('Organization',null=True, on_delete=models.CASCADE)
@@ -267,7 +267,7 @@ class Delivery(TimeStampedModel):
         (STATUS_ASSIGNED, _("assigned")),
     )
     code = models.CharField(max_length=100, blank=True)
-    delivery_adress = PointField()
+    delivery_adress = PointField(default=Point(36.7866471,-1.2981014))
     address = models.CharField(max_length=100, blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
     phone = models.CharField(
