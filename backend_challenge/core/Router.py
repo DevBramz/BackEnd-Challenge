@@ -17,7 +17,7 @@ from backend_challenge.core.exceptions import (
     RoutingException,
     CVRPException,
 )
-
+from django.contrib.gis.geos import GEOSGeometry, LineString, Point
 
 class CVRP: 
     api_key = "AIzaSyBxI_rtVjyCashC_RtMxOuZnrRorwKc34M"
@@ -59,13 +59,16 @@ class CVRP:
         returns a list of all deliveries locations + depot adress including the start adress a in optimization settings
         To be used in calcuation of distance matrix
         """
+        point=[coord for coord in self.optimization_settings.start_address]
+        start=point[::-1]
+
         teamhub_dict_adress = {
             "code": "depot",
             "adress_name": "Kilimani",  # fetch adress from team hub, hardcorded for demo #integration
-            "latlong": self.optimization_settings.start_address,
+            "latlong":start,
           
-        }  # fetch adress from team hub
-        print(self.optimization_settings.start_address)
+        } 
+        # fetch adress from team hub
         if not teamhub_dict_adress:
             raise CVRPException("could not get teamhub adress")
         overall_locations = [teamhub_dict_adress] + [
@@ -232,19 +235,26 @@ class CVRP:
                 route_data["vehicle_capacity_utilization"] = vehicle_utilization
 
                 # route_data["vehicle_capacity_utilization"] =[((route_load/driver["capacity"])*100)for driver in drivers_dict]
-                # print(route_data["vehicle_capacity_utilization"])
-
+               
                 path.append(manager.IndexToNode(index))
             path_adresses = [locations[i]["adress_name"] for i in path]
             deliveries = [locations[i]["code"] for i in path[1 : (len(path) - 1)]]
 
             path_cordinates = [locations[i]["latlong"] for i in path]
+            
+          
             encoded_polyline = polyline.encode(path_cordinates, 5)
-            # print(type(encoded_polyline))
+            print(encoded_polyline)
+        
+            print(path_cordinates)
+           
             route_data["num_deliveries"] = len(deliveries)
             route_data["deliveries"] = deliveries
             route_data["route"] = path_adresses
             route_data["encoded_polyline"] = encoded_polyline
+            route_data["path"]=path_cordinates[:-1]
+          
+            
 
             # routes.append(plan_output)
             operations.append(route_data)

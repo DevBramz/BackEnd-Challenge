@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+
+
+<div id = "map" style = "width: 600px; height: 780px"></div>
+
+{% endblock content %}
+{% block extra_js %}
+<script>
+
+    var encded = "";
+
+    $.ajax({
+        type: "GET",
+        dataType: "json",
+        url: "/api/v1/plan",
+        success: function (data) {
+            $.each(data, function (index, value) {
+                var encded=String(value.encoded_polyline);
+                var path=value.path
+                console.log(encded)
+
+                var mapOptions = {
+                    center: [ -1.286389,  36.817223],
+                    zoom: 10
+                 }
+                 console.log(path)
+                 // Creating a map object
+                 var encoded = "";
+                
+                 var coordinates = L.Polyline.fromEncoded(encded,5).getLatLngs();
+                 
+                 console.log(coordinates);
+                 
+                 
+                 var map = L.map('map').setView([ -1.286389,  36.817223], 11);
+                 L.tileLayer(
+                     'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                         maxZoom: 18,
+                     }).addTo(map);
+                 
+                 
+                 var polyline = L.polyline(
+                     path,
+                     {stroke:true,
+                         color: 'red',
+                         weight: 4,
+                         opacity: 1.0,
+                       
+                         
+                        
+                     }
+                 ).addTo(map);
+
+
+              
+            const tb = document.getElementById("tb");
+            let tr = [];
+            data.forEach(item => {
+                  tr.push('<tr><td>' + item.vehicle + '</td>')
+                  tr.push('<td>' + item.num_deliveries+ '</td>')
+                  tr.push('<td>' + item.driver_name + '</td>')
+                  tr.push('<td>' + item.vehicle_capacity+ '</td>')
+                  
+                  tr.push('<td>' + item.load+ '</td>')
+                  tr.push('<td>' + item.vehicle_capacity_utilization  + '%' +  '</td>')
+                  tr.push('<td>' + item.distance + '</td>')
+                  tr.push('<td>' + item.route + '</td>')
+                })
+                tb.innerHTML = tr.join("");
+                document.getElementById("result").classList.remove("hide"); // show
+            });
+            
+           
+        },
+        
+        
+        error: function(xhr,status, error) {
+            <!-- var err = eval("(" + xhr.responseText + ")"); -->
+            var err = JSON.parse(xhr.responseText);
+            alert(err.detail);
+            alert(xhr.status);
+            
+          },
+    });
+    // Creating map options
+    
+ </script>
+ {% endblock %}

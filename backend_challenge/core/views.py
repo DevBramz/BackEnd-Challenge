@@ -29,6 +29,7 @@ from .serializers import (
 def index(request):
     return render(request, "deliveries.html")
 
+# def view_trip_map(request):
 
 def trips(request):
     return render(request, "trips.html")
@@ -234,13 +235,14 @@ def plan_routes(request):
     # choices=[(o.code, str(o.code)) for o in deliveries]
 
     optimization_settings = RouteSettings.objects.get(org__name="ibuQA")
+    start=optimization_settings.start_address
     # hubs=org.hubs.all(
     # choices=[(o.name, str(o)) for o in hubs]
     # print(hubs)
     # print(choices)
     all_drivers = Driver.objects.all()
-    print(all_drivers)
-    # start=optimization_settings.start_address
+    
+    
 
     if optimization_settings.selection == "Min_Distance":
         drivers = all_drivers
@@ -263,6 +265,7 @@ def plan_routes(request):
 
     routes_summary = route.generate_routes()
     trip_data = routes_summary.get("routes", None)
+   
 
     request.session["trip_data"] = trip_data
     return Response(trip_data)

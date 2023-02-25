@@ -304,7 +304,10 @@ class Delivery(TimeStampedModel):
     def location(self):
         lat = self.delivery_adress.y
         long = self.delivery_adress.x
+       
         location_list = [lat, long]
+       
+       
         location_info = {
             "code": self.code,
             "adress_name": self.address,
@@ -379,6 +382,7 @@ class Trip(TimeStampedModel):
     estimated_completion_time=models.DateTimeField(blank=True, null=True)
     completed_time= models.DateTimeField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICE, default="pending")
+    
     
     
     

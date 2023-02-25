@@ -61,7 +61,7 @@ border-radius: 6px;">
        
       
         <div class="row">
-            <div class="col-6">
+            <div class="col-12">
             
             
                
@@ -100,29 +100,10 @@ border-radius: 6px;">
         
     </div>
     <div class="col-6">
-          </div>
+         
+    
    
-        <!-- <div class="table-responsive p-3">
-            <table
-                id="deliveries-list"
-                class="table  table-sm"
-                style="width:100%"
-            >
-                <thead>
-                    <tr>
-                       
-
-                       <th>vehicle</th>
-                       
-                        <th></th>
-                    </tr>
-                </thead>
-            </table>
-        </div> -->
-        <div class="card-body p-0">
-            <!-- Billing history table-->
-            
-        </div>
+    
 </div>
 </div
 
@@ -135,7 +116,7 @@ border-radius: 6px;">
             url: "/api/v1/plan",
             success: function (data) {
                 $.each(data, function (index, value) {
-                    console.log(value)
+                    
                     $("#div3").append('Route'+ value['vehicle']+'  '+' ' + 'Driver:' + value['driver_name'] + ' ' + 'Deliveries:' + value['num_deliveries']+' '+'Utilisation:' + value['vehicle_capacity_utilization']+ 'Route:' + value['route']);
                 const tb = document.getElementById("tb");
                 let tr = [];
