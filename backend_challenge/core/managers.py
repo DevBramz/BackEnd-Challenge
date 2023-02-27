@@ -29,3 +29,7 @@ class HondaManager(models.Manager):
 # https://wellfire.co/learn/using-django-proxy-models/
 # https://www.screamingatmyscreen.com/managing-state-in-django-models/
 # https://semaphoreci.com/community/tutorials/testing-python-applications-with-pytest
+# https://www.djangospin.com/design-patterns-python/observer/
+# https://www.djangospin.com/design-patterns-python/factory/
+# https://levelup.gitconnected.com/design-patterns-in-python-strategy-pattern-2189c540756d
+# https://auth0.com/blog/strategy-design-pattern-in-python/
