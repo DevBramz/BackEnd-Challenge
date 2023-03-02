@@ -16,15 +16,13 @@
 // Australia which was made by Charles Kingsford Smith.
 function initMap() {
   const map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 3,
-    center: { lat: 0, lng: -180 },
+    zoom: 15,
+    center: { lat:-1.286389, lng: 36.817223 },
     mapTypeId: "terrain",
   });
   const flightPlanCoordinates = [
-    { lat: 37.772, lng: -122.214 },
-    { lat: 21.291, lng: -157.821 },
-    { lat: -18.142, lng: 178.431 },
-    { lat: -27.467, lng: 153.027 },
+    { lat: -1.268665592 , lng:36.805996776 },
+    { lat: -1.292201, lng:36.764021 },
   ];
   const flightPath = new google.maps.Polyline({
     path: flightPlanCoordinates,

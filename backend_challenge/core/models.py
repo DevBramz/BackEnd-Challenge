@@ -257,6 +257,39 @@ class RouteSettings(TimeStampedModel):
 
 
         super().save(**kwargs)
+        
+class Task(TimeStampedModel):
+    code = models.CharField(max_length=100, blank=True)
+    delivery_adress = PointField(default=Point(36.7866471,-1.2981014))
+    address = models.CharField(max_length=100, blank=True, null=True)
+    created = models.DateTimeField(blank=True, null=True)
+    phone = models.CharField(
+        max_length=13,
+        validators=[
+            RegexValidator(
+                regex=r"^\+254\d{9}$",
+                message="Phone number must be entered in the format '+254234567892'. Up to 12 digits allowed with no",
+            ),
+        ],
+    )
+    plannedLocation = PointField(default=Point(36.7866471,-1.2981014))
+    weight = models.PositiveIntegerField(
+        default=1,
+        verbose_name="Quantity/Weight",
+        help_text="For Route Optimization purposes",
+    )
+    # status = models.CharField(max_length=20, choices=STATUS_CHOICE, default="pending")
+    earliest = models.DateTimeField(blank=True, null=True)
+    latest = models.DateTimeField(blank=True, null=True)
+    # trip = models.ForeignKey(
+    #     "Trip",
+    #     related_name="deliveries_in_trip",
+    #     on_delete=models.SET_NULL,
+    #     blank=True,
+    #     null=True,
+    # )
+    notes =models.CharField(max_length=255, blank=True, default="")
+    
 
 
 class Delivery(TimeStampedModel):

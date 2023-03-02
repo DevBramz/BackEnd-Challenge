@@ -66,3 +66,8 @@ def utilize():
         print(' total vol: ', vol_used)
         print(' total weight: ', weight_used)
         return weight_used
+    
+    
+    
+    # https://groups.google.com/g/or-tools-discuss/c/gMgPBryj1wA
+    # https://groups.google.com/g/or-tools-discuss/c/VGeLbk-diWU
