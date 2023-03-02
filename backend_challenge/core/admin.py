@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.gis.admin import OSMGeoAdmin
 from leaflet.admin import LeafletGeoAdmin
 
-from .models import Delivery, Driver, RouteSettings, Trip,Vehicle,Organization,Employee
+from .models import Delivery, Driver, RouteSettings, Trip,Vehicle,Organization,Employee,ShippingContainer
 
 
 @admin.register(Organization)
@@ -14,7 +14,9 @@ class EmployeeAdmin(admin.ModelAdmin):
 # @admin.register(Hub)
 # class HubAdmin(admin.ModelAdmin):
 #     pass
-
+@admin.register(ShippingContainer)
+class ShippingContainer(admin.ModelAdmin):
+    pass
 
 
 @admin.register(RouteSettings)

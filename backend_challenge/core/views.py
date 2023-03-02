@@ -15,7 +15,7 @@ from backend_challenge.core.Router import CVRP
 from backend_challenge.core.exceptions import DispatchException, CVRPException
 from backend_challenge.core.utilization import LoadOptimization
 from .tasks import send_sms_recepient
-
+from .utilization2 import utilize
 
 from .models import (Delivery, Driver, RouteSettings, Trip)
 from .serializers import (
@@ -268,6 +268,7 @@ def plan_routes(request):
    
 
     request.session["trip_data"] = trip_data
+    print(utilize())
     return Response(trip_data)
     # return redirect('/api/v1/dispatch')
 

@@ -17,7 +17,7 @@ class RouteSettingsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RouteSettings
-        fields = [ "selection","start_location", "end_location","departure_time","finish_time",]
+        fields = [ "selection","start_location", "end_location","departure_time","finish_time","avoid_tolls","avoid_highways"]
 
     
 class TripSerializer(serializers.ModelSerializer):

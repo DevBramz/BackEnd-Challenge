@@ -41,12 +41,14 @@ INSTALLED_APPS = [
     "drf_yasg",
     "backend_challenge.core",
     "django",
+    "org",
     "leaflet",
     "corsheaders",
     "django_extensions",
     "rest_framework",
     "social_django",
     "django_filters",
+    'organizations',
 ]
 
 MIDDLEWARE = [

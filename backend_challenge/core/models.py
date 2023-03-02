@@ -15,7 +15,8 @@ from django.contrib.gis.db.models import PointField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import Group
-
+from django.core.validators import MinValueValidator
+from decimal import Decimal as D
 
 import datetime
 
@@ -233,6 +234,8 @@ class RouteSettings(TimeStampedModel):
     finish_time = models.TimeField(blank=True, null=True)
     org=models.ForeignKey('Organization',null=True, on_delete=models.CASCADE)
     service_time=models.DurationField(blank=True, null=True)
+    avoid_tolls=models.BooleanField(default=True)
+    avoid_highways=models.BooleanField(default=True)
 
     class Meta:
         verbose_name = _("RouteSettings")
@@ -476,5 +479,35 @@ class Trip(TimeStampedModel):
 
     def __str__(self):
         return str(self.code)
+    
+class ShippingContainer(models.Model):
+    name = models.CharField(_("Name"), max_length=128, unique=True)
+    description = models.TextField(_("Description"), blank=True)
+    # image = models.ImageField(
+    #     _("Image"), upload_to=settings.OSCAR_IMAGE_FOLDER, max_length=255, blank=True)
+    height = models.DecimalField(
+        _("Height, m"), decimal_places=3, max_digits=12,
+        validators=[MinValueValidator(D('0.00'))])
+    width = models.DecimalField(
+        _("Width, m"), decimal_places=3, max_digits=12,
+        validators=[MinValueValidator(D('0.00'))])
+    length = models.DecimalField(
+        _("Length, m"), decimal_places=3, max_digits=12,
+        validators=[MinValueValidator(D('0.00'))])
+    max_load = models.DecimalField(
+        _("Max loading, kg"), decimal_places=3, max_digits=12,
+        validators=[MinValueValidator(D('0.00'))])
+    
+    def __str__(self):
+        return self.name
+    
+    @property
+    def volume(self):
+        return D(self.height*self.width*self.length)
+    
+    class Meta:
+        
+        verbose_name = _("Shipping Container")
+        verbose_name_plural = _("Shipping Containers")
 
    
