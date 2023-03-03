@@ -17,7 +17,7 @@ from backend_challenge.core.utilization import LoadOptimization
 from .tasks import send_sms_recepient
 from .utilization2 import utilize
 
-from .models import (Delivery, Driver, RouteSettings, Trip)
+from .models import Delivery, Driver, RouteSettings, Trip
 from .serializers import (
     RouteSettingsSerializer,
     DeliverySerializer,
@@ -25,11 +25,12 @@ from .serializers import (
 )
 
 
-
 def index(request):
     return render(request, "deliveries.html")
 
+
 # def view_trip_map(request):
+
 
 def trips(request):
     return render(request, "trips.html")
@@ -139,8 +140,6 @@ class DeliveryViewSet(viewsets.ModelViewSet):
 
     #         return Response(data)
 
-        
-
     @action(detail=True)
     def clone(self, request, pk=None):
         """
@@ -230,19 +229,16 @@ def plan_routes(request):
     deliveries = get_selected_deliveries_in_session(request)
     if not deliveries:
         raise DispatchException
-        
 
     # choices=[(o.code, str(o.code)) for o in deliveries]
 
     optimization_settings = RouteSettings.objects.get(org__name="ibuQA")
-    start=optimization_settings.start_address
+    start = optimization_settings.start_address
     # hubs=org.hubs.all(
     # choices=[(o.name, str(o)) for o in hubs]
     # print(hubs)
     # print(choices)
     all_drivers = Driver.objects.all()
-    
-    
 
     if optimization_settings.selection == "Min_Distance":
         drivers = all_drivers
@@ -265,7 +261,6 @@ def plan_routes(request):
 
     routes_summary = route.generate_routes()
     trip_data = routes_summary.get("routes", None)
-   
 
     request.session["trip_data"] = trip_data
     print(utilize())
@@ -311,14 +306,17 @@ def dispatch_routes(request):
                     delivery.save()
                     # trip.deliveries_in_trip.add(delivery)
                     # send_sms_recepient(delivery.id)
-            transaction.on_commit(lambda:send_sms_recepient.delay(delivery.id))
+            transaction.on_commit(lambda: send_sms_recepient.delay(delivery.id))
 
             # print(trip.deliveries_in_trip.all())
 
             del request.session["trip_data"]
             del request.session["selected"]
             return Response({"message": "Trip_created"})
-    return Response({"message": "Dispatch cannot occur, No route data found"},status=status.HTTP_400_BAD_REQUEST,)
+    return Response(
+        {"message": "Dispatch cannot occur, No route data found"},
+        status=status.HTTP_400_BAD_REQUEST,
+    )
     # raise DispatchException
 
 
@@ -327,7 +325,7 @@ def optimize_dispatch(request):
 
     deliveries = get_selected_deliveries_in_session(request)
     if not deliveries:
-        raise  DispatchException
+        raise DispatchException
 
     # choices=[(o.code, str(o.code)) for o in deliveries]
 
@@ -396,7 +394,6 @@ def optimize_dispatch(request):
                     delivery.save()
             return redirect("/api/v1/trips")
     raise CVRPException("No Trip data")
-    
 
 
 class SettingsDetail(APIView):
@@ -420,7 +417,7 @@ class SettingsDetail(APIView):
         deliveries = get_selected_deliveries_in_session(request)
         if deliveries:
             return redirect("/api/v1/route_summary")
-        raise  DispatchException
+        raise DispatchException
 
 
 #  def post(self, request, *args, **kwargs):
