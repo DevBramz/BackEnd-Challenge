@@ -24,12 +24,30 @@ function initMap() {
     { lat: -1.268665592 , lng:36.805996776 },
     { lat: -1.292201, lng:36.764021 },
   ];
+
+
+
+  var lineSymbol = {
+    path: google.maps.SymbolPath.CIRCLE,
+    scale: 8,
+    fillColor: '#566895',
+    fillOpacity: 1,
+    strokeColor: '#282c41',
+    strokeOpacity: 1,
+    strokeWeight: 2
+};
+
   const flightPath = new google.maps.Polyline({
     path: flightPlanCoordinates,
-    geodesic: true,
     strokeColor: "#FF0000",
     strokeOpacity: 1.0,
     strokeWeight: 2,
+    icons: [
+            {
+                icon: lineSymbol,
+                offset: '100%'
+            },
+        ],
   });
 
   flightPath.setMap(map);

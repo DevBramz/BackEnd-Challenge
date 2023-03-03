@@ -338,11 +338,12 @@ def optimize_dispatch(request):
     # print(hubs)
     # print(choices)
 
-    all_drivers = Driver.objects.all()
+    all_drivers = Driver.objects.all().order_by("capacity")
     # start=optimization_settings.start_address
 
     if optimization_settings.selection == "Min_Distance":
         drivers = all_drivers
+        print(drivers)
 
         route = CVRP(
             drivers,
