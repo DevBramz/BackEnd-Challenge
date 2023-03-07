@@ -3,6 +3,7 @@
 import math
 from math import sqrt
 import numpy as np
+import json
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 import googlemaps
@@ -242,6 +243,8 @@ class CVRP:
 
             path_cordinates = [locations[i]["latlong"] for i in path]
             
+            cords=json.dumps(path_cordinates)
+            
           
             encoded_polyline = polyline.encode(path_cordinates, 5)
             print(encoded_polyline)
@@ -253,7 +256,7 @@ class CVRP:
             route_data["route"] = path_adresses
             route_data["encoded_polyline"] = encoded_polyline
             route_data["path"]=path_cordinates[:-1]
-          
+            route_data["cords"]=cords
             
 
             # routes.append(plan_output)

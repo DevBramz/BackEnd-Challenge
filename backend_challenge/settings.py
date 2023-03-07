@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "backend_challenge.core",
     "django",
     "org",
+    "common",
     "leaflet",
     "corsheaders",
     "django_extensions",
@@ -199,19 +200,19 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 
 
 AUTHENTICATION_BACKENDS = (
-    "mozilla_django_oidc.auth.OIDCAuthenticationBackend",
-    "social_core.backends.open_id.OpenIdAuth",
-    "social_core.backends.google.GoogleOpenId",
-    "social_core.backends.google.GoogleOAuth2",
-    "social_core.backends.google.GoogleOAuth",
-    "social_core.backends.twitter.TwitterOAuth",
-    "social_core.backends.yahoo.YahooOpenId",
+    # "mozilla_django_oidc.auth.OIDCAuthenticationBackend",
+    # "social_core.backends.open_id.OpenIdAuth",
+    # "social_core.backends.google.GoogleOpenId",
+    # "social_core.backends.google.GoogleOAuth2",
+    # "social_core.backends.google.GoogleOAuth",
+    # "social_core.backends.twitter.TwitterOAuth",
+    # "social_core.backends.yahoo.YahooOpenId",
     "django.contrib.auth.backends.ModelBackend",
 )
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
-LOGIN_REDIRECT_URL = "/api/v1/customer"
+# LOGIN_REDIRECT_URL = "/api/v1/customer"
 STATIC_URL = "/static/"
 
 # CSRF_COOKIE_SAMESITE = "None"

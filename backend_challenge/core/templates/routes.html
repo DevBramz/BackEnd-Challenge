@@ -19,8 +19,10 @@
         success: function (data) {
             $.each(data, function (index, value) {
                 var encded=String(value.encoded_polyline);
-                var path=value.path
+                var path=value.cords
                 console.log(encded)
+               
+               
 
                 var mapOptions = {
                     center: [ -1.286389,  36.817223],
@@ -35,24 +37,28 @@
                  console.log(coordinates);
                  
                  
+                 
                  var map = L.map('map').setView([ -1.286389,  36.817223], 11);
                  L.tileLayer(
                      'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                          maxZoom: 18,
                      }).addTo(map);
                  
+                    var control = L.Routing.control({
+                        waypoints:[
+                        L.latLng(-1.297906, 36.78978),
+                        L.latLng(-1.112295850150369,37.00469970188014),
+                        L.latLng(-1.3395233423259272, 36.813812250735026),
+                        L.latLng(-1.297906, 36.78978)
+
+                      ],
+                      router: L.Routing.graphHopper('81581e7d-eca2-400a-a5ff-d5e2db464821'),
+                        show: false,
+                        waypointMode: 'snap',
+                        createMarker: function() {}
+                      }).addTo(map);
                  
-                 var polyline = L.polyline(
-                    coordinates,
-                     {stroke:true,
-                         color: 'red',
-                         weight: 8,
-                         opacity: 1.0,
-                       
-                         
-                        
-                     }
-                 ).addTo(map);
+
 
                 
               

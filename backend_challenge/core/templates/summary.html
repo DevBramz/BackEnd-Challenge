@@ -102,7 +102,7 @@ border-radius: 6px;">
     <div class="col-12">
          
          
-          {% include "gmap.html" %}
+          {% include "routes.html" %}
    
     
 </div>
@@ -117,6 +117,7 @@ border-radius: 6px;">
             url: "/api/v1/plan",
             success: function (data) {
                 $.each(data, function (index, value) {
+                    
                     
                     $("#div3").append('Route'+ value['vehicle']+'  '+' ' + 'Driver:' + value['driver_name'] + ' ' + 'Deliveries:' + value['num_deliveries']+' '+'Utilisation:' + value['vehicle_capacity_utilization']+ 'Route:' + value['route']);
                 const tb = document.getElementById("tb");

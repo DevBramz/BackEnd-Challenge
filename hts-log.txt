@@ -1,0 +1,18 @@
+HTTrack3.49-2 launched on Mon, 06 Mar 2023 18:30:18 at https://www.bootstrapdash.com/demo/polluxui/template/demo/vertical-default-light/index.html
+(httrack https://www.bootstrapdash.com/demo/polluxui/template/demo/vertical-default-light/index.html )
+
+Information, Warnings and Errors reported for this mirror:
+note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
+	such as username/password authentication for websites mirrored in this project
+	do not share these files/folders if you want these information to remain private
+
+18:30:18	Warning: 	Cache: damaged cache, trying to repair
+18:30:18	Warning: 	Cache: 0 bytes successfully recovered in 0 entries
+18:30:18	Warning: 	Cache: error trying to open the cache
+18:30:20	Error: 	"error:00000005:lib(0):func(0):DH lib" (-5) after 2 retries at link https://www.bootstrapdash.com/robots.txt (from primary/primary)
+18:30:20	Warning: 	Retry after error -5 (error:00000005:lib(0):func(0):DH lib) at link https://www.bootstrapdash.com/demo/polluxui/template/demo/vertical-default-light/index.html (from primary/primary)
+18:30:20	Warning: 	HTML file (58302 bytes) retransferred due to lack of cache: https://www.bootstrapdash.com/demo/polluxui/template/demo/vertical-default-light/index.html
+18:30:21	Warning: 	Retry after error -5 (error:00000005:lib(0):func(0):DH lib) at link https://www.bootstrapdash.com/demo/polluxui/template/demo/vertical-default-light/index.html (from primary/primary)
+18:30:21	Warning: 	HTML file (58302 bytes) retransferred due to lack of cache: https://www.bootstrapdash.com/demo/polluxui/template/demo/vertical-default-light/index.html
+18:30:24	Error: 	"error:00000005:lib(0):func(0):DH lib" (-5) after 2 retries at link https://www.bootstrapdash.com/demo/polluxui/template/demo/vertical-default-light/index.html (from primary/primary)
+18:30:24	Warning: 	No data seems to have been transferred during this session! : restoring previous one!

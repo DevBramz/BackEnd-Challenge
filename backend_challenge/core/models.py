@@ -21,6 +21,9 @@ from decimal import Decimal as D
 import datetime
 
 
+
+
+
 def generate_secret():
 
     initial = "DEL"
@@ -37,8 +40,6 @@ def get_organization_hubs():
     org = Organization.objects.get(org__name="ibuQA")
     hubs = org.hubs.all()
     choices = [(o.name, str(o)) for o in hubs]
-    print(hubs)
-    print((choices))
     return choices
 
 

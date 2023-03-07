@@ -386,6 +386,7 @@ def optimize_dispatch(request):
                 )
                 print(trip)
                 trip.dispatch()
+                # transaction.on_commit(lambda:send_sms_recepient.delay(delivery))
                 #   send sms  post save signal
 
                 for delivery in deliverys:

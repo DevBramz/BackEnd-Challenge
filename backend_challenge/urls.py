@@ -48,4 +48,5 @@ urlpatterns = [
     path("oidc/", include("mozilla_django_oidc.urls")),
     path("social-auth/", include("social_django.urls", namespace="social")),
     path("api/v1/", include("backend_challenge.core.urls", namespace="core")),
+    path("organizations/", include('organizations.urls')),
 ]

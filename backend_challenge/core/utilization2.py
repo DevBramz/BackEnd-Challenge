@@ -71,3 +71,4 @@ def utilize():
     
     # https://groups.google.com/g/or-tools-discuss/c/gMgPBryj1wA
     # https://groups.google.com/g/or-tools-discuss/c/VGeLbk-diWU
+    # https://www.vanderwaal.eu/mini-projecten/google-maps-animated-polyline

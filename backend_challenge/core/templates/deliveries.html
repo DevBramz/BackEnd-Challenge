@@ -92,6 +92,7 @@ border-radius: 6px;">
             >
                 <thead>
                     <tr>
+                        <th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>
                     
                        <th>code</th>
                        <th>phone</th>
@@ -141,9 +142,20 @@ border-radius: 6px;">
                     orderable: false,
                     
                     'targets': 0,
+                    'searchable': false,
+                    'orderable': false,
+                    'className': 'dt-body-center',
+                    'render': function (data, type, full, meta){
+                        return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+                    }
                     
                     
                 } ],
+                dom: 'Bfrtip',
+    buttons: [
+        'selectAll',
+        'selectNone'
+    ],
                 select: {
                     style: 'multi',
                 },
@@ -155,6 +167,7 @@ border-radius: 6px;">
                     url: data_url,
                     dataSrc: 'data'
                 },
+               
                 columns: [
                     {
                         data: 'code',
@@ -184,7 +197,8 @@ border-radius: 6px;">
 
 
 
-                ]
+                ],
+               
             });
 
             $('#optimize-button').on('click', function() {
