@@ -21,10 +21,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY="+63moyr!(3^666l62(@^u$zt!s1)ofxg^"
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DEBUG", cast=bool)
+DEBUG = True
 
 
 # Application definition
@@ -223,7 +224,9 @@ OIDC_OP_JWKS_ENDPOINT = "https://www.googleapis.com/oauth2/v3/certs"
 OIDC_OP_AUTHORIZATION_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth"
 OIDC_OP_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
 OIDC_OP_USER_ENDPOINT = "https://openidconnect.googleapis.com/v1/userinfo"
-OIDC_RP_CLIENT_ID = config("OIDC_RP_CLIENT_ID")
+OIDC_RP_CLIENT_ID ="1084835314828-s8npea9jce01udttaf8td5627p9k06fg.apps.googleusercontent.com"
+OIDC_RP_CLIENT_SECRET= "4ZbM0GBZVisPA9YrBP3lFcr5"  
+AFRICASTALKING_API_KEY = "4b687203c43211be0e43105531bf92d7d8ad44d778bdfcf869988c465049291e"
 OIDC_RP_CLIENT_SECRET = config("OIDC_RP_CLIENT_SECRET")
 CELERY_BROKER_URL ='redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ["application/json"]
