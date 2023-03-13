@@ -17,6 +17,7 @@ from django.db import models
 from django.contrib.auth.models import Group
 from django.core.validators import MinValueValidator
 from decimal import Decimal as D
+from django.db.models import ExpressionWrapper, DecimalField  
 
 import datetime
 
@@ -397,7 +398,7 @@ class Trip(TimeStampedModel):
     __current_status = None
 
     code = models.CharField(max_length=100, blank=True, editable=False)
-    # driver = models.CharField(max_length=100, blank=True)
+    trip_code = models.CharField(max_length=100, blank=True, editable=False)
     distance = models.CharField(max_length=100, blank=True, null=True)
     load = models.CharField(max_length=100, blank=True)
     utilization = models.CharField(max_length=100, blank=True, editable=False)
@@ -455,7 +456,6 @@ class Trip(TimeStampedModel):
 
         if self.pk and updated:
             self.__current_status = self.status
-
         if not self.code:
             self.code = set_trip_code()
         if not self.num_deliveries:

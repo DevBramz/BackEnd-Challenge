@@ -45,8 +45,8 @@ urlpatterns = [
     ),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
     path("admin/", admin.site.urls),
-    path("oidc/", include("mozilla_django_oidc.urls")),
-    path("social-auth/", include("social_django.urls", namespace="social")),
+    # path("oidc/", include("mozilla_django_oidc.urls")),
+    # path("social-auth/", include("social_django.urls", namespace="social")),
     path("api/v1/", include("backend_challenge.core.urls", namespace="core")),
-    path("organizations/", include('organizations.urls')),
+    # path("organizations/", include('organizations.urls')),
 ]

@@ -8,10 +8,6 @@ from .models import Delivery, Driver, RouteSettings, Trip,Vehicle,Organization,E
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     pass
-@admin.register(Employee)
-class EmployeeAdmin(admin.ModelAdmin):
-    pass
-# @admin.register(Hub)
 # class HubAdmin(admin.ModelAdmin):
 #     pass
 @admin.register(ShippingContainer)
@@ -48,6 +44,7 @@ class TripAdmin(OSMGeoAdmin):
     list_display = (
         "id",
         "code",
+        "trip_code",
         "driver",
         "num_deliveries",
         "load",

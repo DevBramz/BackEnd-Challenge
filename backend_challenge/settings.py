@@ -33,13 +33,14 @@ DEBUG = True
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
-    "mozilla_django_oidc",
+    # "mozilla_django_oidc",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'django.contrib.gis',
     "drf_yasg",
+    "accounts",
     "backend_challenge.core",
     "django",
     "org",
@@ -48,9 +49,9 @@ INSTALLED_APPS = [
     "corsheaders",
     "django_extensions",
     "rest_framework",
-    "social_django",
+    # "social_django",
     "django_filters",
-    'organizations',
+    # 'organizations',
 ]
 
 MIDDLEWARE = [
@@ -157,6 +158,7 @@ CACHES = {
     }
 }
 
+AUTH_USER_MODEL = "accounts.User"
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
