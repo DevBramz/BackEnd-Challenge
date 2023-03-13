@@ -21,6 +21,8 @@ from django.db.models import ExpressionWrapper, DecimalField
 
 import datetime
 
+from org.models import Organization
+
 
 
 
@@ -164,7 +166,7 @@ class RouteSettings(TimeStampedModel):
     end_address = PointField(default=Point(36.7866471, -1.2981014))
     departure_time = models.TimeField(blank=True, null=True)  # set departure tim
     finish_time = models.TimeField(blank=True, null=True)
-    org = models.ForeignKey("Organization", null=True, on_delete=models.CASCADE)
+    org = models.ForeignKey(Organization, null=True, on_delete=models.CASCADE)
     service_time = models.DurationField(blank=True, null=True)
     avoid_tolls = models.BooleanField(default=True)
     avoid_highways = models.BooleanField(default=True)
@@ -339,7 +341,7 @@ class Trip(TimeStampedModel):
     __current_status = None
 
     code = models.CharField(max_length=100, blank=True, editable=False)
-    trip_code = models.CharField(max_length=100, blank=True, editable=False)
+    # trip_code = models.CharField(max_length=100, blank=True, editable=False)
     distance = models.CharField(max_length=100, blank=True, null=True)
     load = models.CharField(max_length=100, blank=True)
     utilization = models.CharField(max_length=100, blank=True, editable=False)

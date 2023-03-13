@@ -1,14 +1,14 @@
 import textwrap
 import uuid
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-
-from backend_challenge.core.models import TimeStampedModel
+# from backend_challenge.core.modelsODE import TimeStampedModel
 
 # Create your models here.
 
 
-class Organization(TimeStampedModel):
+class Organization(models.Model):
     """
     Organization Model Fields
     """
@@ -48,13 +48,13 @@ class Organization(TimeStampedModel):
         default="USD",
         help_text=_("The currency that the organization uses"),
     )
-    trip = models.ForeignKey(
-        "Trip",
-        related_name="deliveries_in_trip",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-    )
+    # trip = models.ForeignKey(
+    #     "Trip",
+    #     related_name="deliveries_in_trip",
+    #     on_delete=models.SET_NULL,
+    #     blank=True,
+    #     null=True,
+    # )
     # )
     # logo = models.ImageField(
     #     _("Logo"), upload_to="organizations/logo/", null=True, blank=True

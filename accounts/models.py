@@ -8,7 +8,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 
-from backend_challenge.core.models import Organization
+# from backend_challenge.core.models import Organization
 
 
 class UserManager(BaseUserManager):

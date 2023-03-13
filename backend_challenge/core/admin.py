@@ -2,12 +2,12 @@ from django.contrib import admin
 from django.contrib.gis.admin import OSMGeoAdmin
 from leaflet.admin import LeafletGeoAdmin
 
-from .models import Delivery, Driver, RouteSettings, Trip,Vehicle,Organization,Employee,ShippingContainer
+from .models import Delivery, Driver, RouteSettings, Trip,Vehicle,Employee,ShippingContainer
 
 
-@admin.register(Organization)
-class OrganizationAdmin(admin.ModelAdmin):
-    pass
+# @admin.register(Organization)
+# class OrganizationAdmin(admin.ModelAdmin):
+#     pass
 # class HubAdmin(admin.ModelAdmin):
 #     pass
 @admin.register(ShippingContainer)
@@ -44,7 +44,6 @@ class TripAdmin(OSMGeoAdmin):
     list_display = (
         "id",
         "code",
-        "trip_code",
         "driver",
         "num_deliveries",
         "load",
