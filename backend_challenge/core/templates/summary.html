@@ -54,7 +54,7 @@ border-radius: 6px;">
                
              
               
-            <div id="div2">Route Summary
+            <div id="div2">
             <button class="btn btn-primary" id="dispatch-button">Dispatch</button>
             
         </div>
@@ -68,7 +68,7 @@ border-radius: 6px;">
                 
             
         <div id="result" class="hide">
-          <span>Table  View</span>
+          <!-- <span>Table  View</span> -->
             <table id="table1">
               <thead>
                 <tr>
@@ -79,7 +79,7 @@ border-radius: 6px;">
                  
                   <th>Load</th>
                  
-                  <th>Usage</th>
+                  <!-- <th>Usage</th> -->
                   <th>Mileage</th>
                  
                   <th>Path</th>
@@ -89,7 +89,7 @@ border-radius: 6px;">
             </table>
           </div>
           <div class="toolbar float-left">
-            <button class="btn btn-primary" id="settings-button">Back to Settings </button>
+            <!-- <button class="btn btn-primary" id="settings-button">Back to Settings </button> -->
 
               
             </form>
@@ -129,7 +129,6 @@ border-radius: 6px;">
                       tr.push('<td>' + item.vehicle_capacity+ '</td>')
                       
                       tr.push('<td>' + item.load+ '</td>')
-                      tr.push('<td>' + item.vehicle_capacity_utilization  + '%' +  '</td>')
                       tr.push('<td>' + item.distance + '</td>')
                       tr.push('<td>' + item.route + '</td>')
                     })

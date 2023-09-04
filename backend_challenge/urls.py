@@ -18,6 +18,7 @@ from django.urls import include, path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
+from rest_framework.authtoken import views
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -45,8 +46,11 @@ urlpatterns = [
     ),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
     path("admin/", admin.site.urls),
+    path('api-token-auth/', views.obtain_auth_token),
+    
     # path("oidc/", include("mozilla_django_oidc.urls")),
     # path("social-auth/", include("social_django.urls", namespace="social")),
+    path("accounts/", include("accounts.urls", namespace="accounts")),
     path("api/v1/", include("backend_challenge.core.urls", namespace="core")),
     # path("organizations/", include('organizations.urls')),
 ]

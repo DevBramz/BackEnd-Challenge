@@ -11,7 +11,7 @@ class LoadOptimization:
         self.deliveries, self.drivers = de, d
 
     def create_data_model(self):
-        """Create the data for the example."""
+                        
         data = {}
         drivers_dict = self.drivers.values()
         weights = list(self.deliveries.values_list("weight", flat=True))
@@ -24,6 +24,14 @@ class LoadOptimization:
         return data
 
     def main(self):
+        """_summary_
+
+        Raises:
+            RoutingException: _description_
+
+        Returns:
+            _type_: _description_
+        """
         data = self.create_data_model()
 
         # Create the mip solver with the SCIP backend.

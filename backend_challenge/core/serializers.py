@@ -12,6 +12,7 @@ import datetime
 
 
 class RouteSettingsSerializer(serializers.ModelSerializer):
+    
     # day = serializers.DateField(initial=datetime.date.today)
     # routes_data = serializers.SerializerMethodField()
 
@@ -66,8 +67,13 @@ class DeliverySerializer(serializers.ModelSerializer):
 class ContactForm(serializers.Serializer):
     email = serializers.EmailField()
     message = serializers.CharField()
-
+    
     def save(self):
+        """
+        args:
+        
+        """
+
         email = self.validated_data["email"]
         message = self.validated_data["message"]
 
