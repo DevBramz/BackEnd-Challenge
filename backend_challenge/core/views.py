@@ -329,7 +329,7 @@ def optimize_dispatch(request):
 
     # choices=[(o.code, str(o.code)) for o in deliveries]
 
-    optimization_settings = RouteSettings.objects.get(org__name="ibuQA")
+  
     # settings=model_to_dict(optimization_settings)
     # settings=RouteSettingsSerializer(optimization_settings).data
     # org=Organization.objects.get(name="ibuQA")

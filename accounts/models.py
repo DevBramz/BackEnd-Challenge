@@ -8,6 +8,8 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 
+from org.models import Organization
+
 # from backend_challenge.core.models import Organization
 
 
@@ -59,6 +61,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     # represent the `User` in the UI. We want to index this column in the
     # database to improve lookup performance.
     username = None
+    full_name= models.CharField(max_length=255, )
 
     # We also need a way to contact the user and a way for the user to identify
     # themselves when logging in. Since we need an email address for contacting
@@ -199,14 +202,17 @@ class UserNotification(models.Model):
     in_app_notifications = models.BooleanField(default=True)
     
 
-# class UserProfile(models.Model):
-#     """
-#     User Notification model stores user's preferences for notifications.
-#     By default all users are "opted in" to notifications
-#     """
+class UserProfile(models.Model):
+    """
+    User Notification model stores user's preferences for notifications.
+    By default all users are "opted in" to notifications
+    """
 
-#     user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True,)
-#     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True,)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    
+    
+    
     
     
 

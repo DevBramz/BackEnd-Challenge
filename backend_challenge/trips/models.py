@@ -78,37 +78,7 @@ class Trip(GenericModel):
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICE, default="STATUS_PENDING"
     )
-    # class  Stop(GenericModel):
-    #     state=
-    # sequence of the stop
-    #     tasks=ArrayField(
-    #         ArrayField(
-    #             models.CharField(max_length=255, blank=True),
-
-    #         ), )
-
-    # @property
-    # def trip_deliveries(self):
-    #     # lat = self.delivery_adress.y
-    #     # long = self.delivery_adress.x
-    #     # location_list = [lat, long]
-    #     # location_info = {
-    #     #     "code": self.code,
-    #     #     "adress_name": self.address,
-    #     #     "latlong": location_list,
-    #     trip_deliveries = Delivery.objects.filter(trip=self).count()
-
-    #     return str(trip_deliveries)
-
-    # duration=models.CharField(max_length=100, blank=True)
-
-    # driver = models.ForeignKey(
-    #     Driver,
-    #     related_name='trips_assigned',
-    #     blank=True,
-    #     null=True,
-
-    # # )
+   
     class Meta:
         ordering = ["-created_at"]
 
@@ -323,3 +293,4 @@ class Order(GenericModel):
 #     related_name="payments",
 #     on_delete=models.SET_NULL,
 # )
+100+50+120+80

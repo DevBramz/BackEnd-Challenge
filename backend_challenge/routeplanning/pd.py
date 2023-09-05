@@ -36,10 +36,9 @@ gmaps = googlemaps.Client(key="AIzaSyCxPhWHPyUnBxaNSfxaCyVXdIIm7aGKmTY")
 
 class CVRPD:
     """
-    capacitated vehicle routing problem (CVRP) is a VRP in which vehicles
-    with limited carrying capacity need to deliver items at various locations.
-    The items have a quantity, such as weight or volume, and the vehicles have a maximum
-    capacity that they can carry. The sees to is to  deliver the items for the
+    capacitated vehicle routing,Pickup and Delivery problem (CVRPD) is a VRP in which vehicles
+    with limited carrying capacity need to  pick up items at various locations and
+drops them off at others. . The items have a quantity, such as weight or volume, and the vehicles have a maximumcapacity that they can carry. which each vehicle picks up items at various locations and drops them off at others. The problem is to assign routes for the vehicles to pick up and deliver all the items, while minimizing the length of the longest route.The sees to is to  deliver the items for the
     least cost, while never exceeding the capacity of the vehicles.
     """
 
