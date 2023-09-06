@@ -31,7 +31,7 @@ from core.exceptions import CVRPException, RoutingException
 
 logger = logging.getLogger(__name__)
 
-gmaps = googlemaps.Client(key="AIzaSyCxPhWHPyUnBxaNSfxaCyVXdIIm7aGKmTY")
+gmaps = googlemaps.Client(key="AIUnBxaNSfxaCyVXdIIm7aGK")
 
 
 class CVRPD:
