@@ -134,9 +134,8 @@ def order_route_settings_in_session(request):
 @api_view()
 def plan_routes(request):
     user = request.user
-    orguser = OrgUser.objects.get(user=user)
-    settings = orguser.routesettings
-    # settings_data = RouteSettingsSerializer(settings).data
+    
+    settings = RouteSettingsSerializer(settings).data
     start_address = settings.start_point.address
     start_latlong = settings.start_point.latlong
     start_cords = settings.start_point.cords
@@ -375,103 +374,6 @@ def dispatch_routes(request):
         status=status.HTTP_400_BAD_REQUEST,
     )
 
-
-@api_view()
-def dispatch_order_route(request):
-    org = request.user.organization
-    """
-    Creates and dispatches trip from routes
-    """
-    routes = request.session.get("trip_data", None)
-
-    if routes:
-        with transaction.atomic():
-            for i, route in enumerate(routes):
-                # driver = route["driver_name"]
-                # driver = Driver.objects.get(displayName=driver)
-
-                num_stops = route["num_stops"]
-                shipments = route["route_shipments"]
-                route_shipments = json.loads(shipments)
-                shipment_ids = [i["id"] for i in route_shipments]
-                shipments_in_trip = Shipment.objects.filter(id__in=list(shipment_ids))
-
-                distance = route["distance"]
-                duration_seconds = route["duration"]
-                duration = time.strftime("%Hhrs:%Mmins", time.gmtime(duration_seconds))
-
-                departure_time = route["departure_time"]
-                departure = datetime.strptime(departure_time, "%a %d %b %Y, %I:%M%p")
-                stop_info = route["stop_data"]
-
-                load = route["load"]
-                estimated_completion_time = route["est"]
-                est = datetime.strptime(
-                    estimated_completion_time, "%a %d %b %Y, %I:%M%p"
-                )
-
-                trip = Trip.objects.create(
-                    load=load,
-                    duration=duration,
-                    distance=distance,
-                    num_stops=num_stops,
-                    departure_time=departure,
-                    estimated_completion_time=est,
-                    organization=org,
-                    status="Awaiting_Assignment",
-                )
-                sequence = 0
-                for stop in stop_info:
-                    stop_eta = stop["stop_eta"]
-                    eta = datetime.strptime(stop_eta, "%a %d %b %Y, %I:%M%p")
-                    address = stop.get("stop_address", None)
-
-                    location = Location.objects.get(address=address)
-                    stop = Stop.objects.create(
-                        organization=org,
-                        eta=eta,
-                        sequence=sequence,
-                        location=location,
-                        trip=trip,
-                    )
-                    ShipmentTask.objects.filter(
-                        Q(location=stop.location)
-                        & Q(shipment__in=list(shipments_in_trip))
-                    ).update(stop=stop)
-                    sequence += 1
-
-                    # [stop.stop_tasks.add(task)for task in tasks_in_stop]
-
-                for shipment in shipments_in_trip:
-                    shipment.trip = trip
-                    # shipment.status = "assigned"
-                    shipment.save()
-
-                trip_url = reverse("trips:trip_stops", args=(trip.pk,), request=request)
-
-                # trip.dispatch()
-                #   send sms  post save signal5
-
-                trip_url = reverse("trips:trip_stops", args=(trip.pk,), request=request)
-                # print(assigned_trip)
-                m = f"hello ,{driver.displayName} You have a new trip request.Click here to view {trip_url}"
-
-                # stop_sequences = route["stop_sequences"]
-                #  route["distance"]
-                # trip.deliveries_in_trip.add(delivery)
-                # send_sms_recepient(delivery.id)
-            # transaction.on_commit(lambda: send_sms_recepient.delay(delivery.id))
-
-            # print(trip.deliveries_in_trip.all())
-
-            # del request.session["trip_data"][index]
-            # del request.session["selected_shipments"]
-            del request.session["selected_drivers"]
-            return Response({"message": "Trip_created"})
-    return Response(
-        {"message": "Dispatch cannot occur, No route data found"},
-        status=status.HTTP_400_BAD_REQUEST,
-    )
 
 
 

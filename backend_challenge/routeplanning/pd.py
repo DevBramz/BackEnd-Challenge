@@ -81,9 +81,6 @@ drops them off at others. . The items have a quantity, such as weight or volume,
         returns a list of all shipments locations + depot adress including the start adress a in optimization settings
         To be used in calcuation of distance matrix
         """
-        # point = [coord for coord in self.optimization_settings.start_point.l]
-        # start = point[::-1]
-
         teamhub_dict_adress = {
             "address": self.start_address,
             "latlong": self.start_latlong,
@@ -200,6 +197,7 @@ drops them off at others. . The items have a quantity, such as weight or volume,
                 row["elements"][j]["duration"]["value"]
                 for j in range(len(row["elements"]))
             ]
+            
 
             time_matrix.append(row_list)
         return time_matrix
